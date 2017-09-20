@@ -83,9 +83,9 @@ if __name__ == "__main__":
     n = n_t08(cd)
     M = np.logspace(11, 16, num=100, base=10)
     dndlM = np.array([n.dndlM(Mi, 1.0) for Mi in M])
-    V = 1050.**3
+
     import matplotlib.pyplot as plt
-    plt.loglog(M, dndlM*V)
+    plt.loglog(M, dndlM)
     plt.show()
     plt.clf()
 
@@ -93,5 +93,5 @@ if __name__ == "__main__":
     Mbins = np.array([M[:-1], M[1:]]).T
     number = np.array([n.n_bin(Mbi[0], Mbi[1], 1.0) for Mbi in Mbins])
     Mave = np.mean(Mbins, 1)
-    plt.loglog(Mave, number*V)
+    plt.loglog(Mave, number)
     plt.show()
