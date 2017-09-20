@@ -43,23 +43,13 @@ class t08_emu(object):
         self.gplist = gplist
         return
 
-    def predict_slope_intercept(self, cosmo):
+    def predict_slopes_intercepts(self, cosmo):
         x = np.atleast_2d(cosmo)
         y = self.means.T
         params = np.array([gp.predict(yi, x)[0] for yi,gp in zip(y, self.gplist)])
-        return np.dot(self.R, params)
-
-    def predict_params(self, cosmo, a):
-        #a is scale factor
-        k = a-0.5
-        d0,d1,f0,f1,g0,g1 = self.predict_slope_intercept(cosmo)
-        d = d0 + k*d1
-        e = np.array([1.0]) #Default Tinker08 value
-        f = f0 + k*f1
-        g = g0 + k*g1
-        return np.array([d, e, f, g]).flatten()
+        return np.dot(self.R, params).flatten()
 
 if __name__ == "__main__":
     t = t08_emu()
     cos = cosmos[0]
-    print t.predict_params(cos, 0)
+    print t.predict_slopes_intercepts(cos)
