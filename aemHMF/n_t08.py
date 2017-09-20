@@ -63,7 +63,7 @@ class n_t08(object):
         return
 
     def dndlM(self, M, a):
-        if self.a != a: merge_t08_params(a)
+        if self.a != a: self.merge_t08_params(a)
         sM = cc.sigmaMtophat(M, a)
         d,e,f,g = self.t08_params
         gsigma = self.B*((sM/e)**-d + sM**-f) * np.exp(-g/sM**2)
@@ -81,17 +81,27 @@ class n_t08(object):
 if __name__ == "__main__":
     cd = {"om":0.3,"ob":0.05,"ol":1.-0.3,"ok":0.0,"h":0.7,"s8":0.77,"ns":0.96,"w0":-1.0,"wa":0.0,"Neff":3.0}
     n = n_t08(cd)
-    M = np.logspace(11, 16, num=100, base=10)
-    dndlM = np.array([n.dndlM(Mi, 1.0) for Mi in M])
+    V = 1050.**3
+    M = np.logspace(12, 16, num=100, base=10)
 
     import matplotlib.pyplot as plt
-    plt.loglog(M, dndlM)
+    cmap = plt.get_cmap("brg")
+    for i in range(3):
+        a = 1./(1.+i)
+        c = (1-a)/2
+        dndlM = np.array([n.dndlM(Mi, a) for Mi in M])
+        plt.loglog(M, dndlM, c=cmap(c))
+    plt.ylim(1e-12, 1e-1)
     plt.show()
     plt.clf()
 
     M = np.logspace(11, 16, num=11, base=10)
     Mbins = np.array([M[:-1], M[1:]]).T
-    number = np.array([n.n_bin(Mbi[0], Mbi[1], 1.0) for Mbi in Mbins])
     Mave = np.mean(Mbins, 1)
-    plt.loglog(Mave, number)
+    for i in range(3):
+        a = 1./(1.+i)
+        c = (1-a)/2
+        number = np.array([n.n_bin(Mbi[0], Mbi[1], a) for Mbi in Mbins])
+        plt.loglog(Mave, number*V, c=cmap(c))
+    plt.ylim(1e0, 1e8)
     plt.show()
