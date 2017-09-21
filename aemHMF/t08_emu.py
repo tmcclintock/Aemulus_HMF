@@ -14,7 +14,6 @@ cosmos_path   = data_path+"cosmos.txt"
 cosmos = np.genfromtxt(cosmos_path)
 cosmos = np.delete(cosmos, 0, 1)  #boxnum
 cosmos = np.delete(cosmos, 4, 1)  #ln10As
-cosmos = np.delete(cosmos, -1, 0) #box 39
 N_cosmos = len(cosmos)
 N_params = len(cosmos[0])
 
