@@ -16,18 +16,21 @@ rhocrit = 3.*(Mpcperkm*100)**2/(8*np.pi*G) #Msun h^2/Mpc^3
 class n_t08(object):
     
     def __init__(self, cosmo_dict, a=1.0):
-        self.cosmo_dict = cosmo_dict
         self.a = a
+        self.t_08 = t08_emu.t08_emu()
+        self.set_cosmology(cosmo_dict)
+
+    def set_cosmology(self, cosmo_dict):
+        self.cosmo_dict = cosmo_dict
         self.rhom       = cosmo_dict['om']*rhocrit #Msun h^2/Mpc^3
         cc.set_cosmology(cosmo_dict)
-        t = t08_emu.t08_emu()
-        cos = self.cos_from_dict()
-        self.t08_slopes_intercepts = t.predict_slopes_intercepts(cos)
-        self.merge_t08_params(a)
+        cos = self.cos_from_dict(cosmo_dict)
+        self.t08_slopes_intercepts = self.t_08.predict_slopes_intercepts(cos)
+        self.merge_t08_params(self.a)
         self.calc_normalization()
 
-    def cos_from_dict(self):
-        cd = self.cosmo_dict
+    def cos_from_dict(self, cosmo_dict):
+        cd = cosmo_dict
         om = cd['om']
         ob = cd['ob']
         w0 = cd['w0']
@@ -77,6 +80,12 @@ class n_t08(object):
         dndlM = np.array([self.dndlM(Mi, a) for Mi in M])
         spl = IUS(lM, dndlM)
         return spl.integral(np.log(Mlow), np.log(Mhigh))
+
+    def n_bins(self, Mbins, a):
+        return np.array([self.n_bin(Mbi[0], Mbi[1], a) for Mbi in Mbins])
+
+def peak_height(M, a):
+    return 1.686/cc.sigmaMtophat(M, a)
 
 if __name__ == "__main__":
     cd = {"om":0.3,"ob":0.05,"ol":1.-0.3,"ok":0.0,"h":0.7,"s8":0.77,"ns":0.96,"w0":-1.0,"wa":0.0,"Neff":3.0}

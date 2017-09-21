@@ -32,8 +32,7 @@ class f_gp(object):
             x = np.atleast_2d([nu, z])
         else: #nu and z are arrays
             x = np.array([nu, z]).T
-        mu, cov = self.gp.predict(self.R, x)
-        return mu, cov
+        return self.gp.predict(self.R, x)
 
     def sample_f(self, nu, z):
         if np.shape(nu) != np.shape(z):
