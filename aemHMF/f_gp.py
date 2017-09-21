@@ -6,7 +6,8 @@ import inspect
 import numpy as np
 import os
 data_path = os.path.dirname(os.path.abspath(inspect.stack()[0][1]))
-Rt08_path = data_path+"/data_files/R_T08_residuals.txt"
+#Rt08_path = data_path+"/data_files/R_T08_residuals.txt"
+Rt08_path = data_path+"/data_files/R_T08.txt"
 
 #GP_parameters, computed ahead of time
 k = 9.44e-4
