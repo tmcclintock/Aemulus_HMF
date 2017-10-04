@@ -16,8 +16,12 @@ def get_darksky_data(a): #Masses are Msun/h, volume is [Mpc^3/h^3] comoving
 def get_prediction(bin_center_mass, a, cosmo):
     hmf = aemHMF.Aemulus_HMF()
     hmf.set_cosmology(cosmo)
-    dndlM_aem = np.array([hmf.n_t08.dndlM(M, a) for M in bin_center_mass])
-    return dndlM_aem
+    return np.array([hmf.n_t08.dndlM(M, a) for M in bin_center_mass])
+
+def get_cc_prediction(bin_center_mass, a, cosmo):
+    import cosmocalc as cc
+    cc.set_cosmology(cosmo)
+    return np.array([cc.tinker2008_mass_function(M, a, 200)*M for M in bin_center_mass])
 
 if __name__ == "__main__":
     a = scale_factors[-1]
@@ -29,13 +33,25 @@ if __name__ == "__main__":
     cosmo = {"om":Om, "ob":Ob, "ol":1-Om, "h":h, "s8":sig8, "ns":0.9676, "w0":-1, "Neff":3.08}
     dndlM_aem = get_prediction(M, a, cosmo)
     pdiff = (dndlM - dndlM_aem)/dndlM_aem
+    pdiff = np.log(dndlM/dndlM_aem)
 
-    print (dndlM/dndlM_aem)[:10]
+    dndlM_cc = get_cc_prediction(M, a, cosmo)
+    #pdcc = (dndlM - dndlM_cc)/dndlM_cc
+    pdcc = np.log(dndlM/dndlM_cc)
+
+    print (dndlM_aem/dndlM)[10:20]
 
     f, axarr = plt.subplots(2, sharex=True)
-    axarr[0].loglog(M, dndlM, ls='', marker='.', c='k')
-    axarr[0].loglog(M, dndlM_aem, ls='-', c='b')
+    axarr[0].loglog(M, dndlM, ls='', marker='.', c='k', label="darksky")
+    axarr[0].loglog(M, dndlM_aem, ls='-', c='b', label="Aemulus")
+    axarr[0].loglog(M, dndlM_cc, ls='-', c='r', label="Tinker08")
+    axarr[0].set_ylabel(r"$dn/d\ln M$")
+    axarr[0].legend(loc=0)
 
+    plt.subplots_adjust(hspace=0)
     axarr[1].plot(M, pdiff, c='b', ls='-')
+    axarr[1].plot(M, pdcc, c='r', ls='-')
+    axarr[1].set_xlabel(r"$M$")
+
     axarr[1].axhline(0, c='k', ls='--')
     plt.show()
