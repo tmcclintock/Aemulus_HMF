@@ -34,9 +34,11 @@ class t08_emu(object):
         gplist = []
         for i in range(N_emus):
             y, yerr = means[:, i], errs[:, i]
-            kernel = 1.*george.kernels.ExpSquaredKernel(lguess, ndim=N_params)+george.kernels.WhiteKernel(1, ndim=N_params)
+            #NEED TO FIX THIS. There is no more white kernel
+            kernel = 1.*george.kernels.ExpSquaredKernel(lguess, ndim=N_params)#+george.kernels.WhiteKernel(1, ndim=N_params)
             gp = george.GP(kernel)
             gp.compute(cosmos, yerr)
+            #NEED TO FIX THIS. There is no more gp.optimize()
             gp.optimize(cosmos, y, yerr, verbose=False)
             gplist.append(gp)
         self.gplist = gplist
