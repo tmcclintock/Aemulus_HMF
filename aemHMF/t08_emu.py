@@ -5,6 +5,7 @@ It does not contain the code for the mass function itself.
 import george
 import inspect
 import numpy as np
+import scipy.optimize as op
 import os
 data_path = os.path.dirname(os.path.abspath(inspect.stack()[0][1]))+"/data_files/"
 R_matrix_path = data_path+"R_matrix.txt"
@@ -36,10 +37,19 @@ class t08_emu(object):
             y, yerr = means[:, i], errs[:, i]
             #NEED TO FIX THIS. There is no more white kernel
             kernel = 1.*george.kernels.ExpSquaredKernel(lguess, ndim=N_params)#+george.kernels.WhiteKernel(1, ndim=N_params)
-            gp = george.GP(kernel)
+            gp = george.GP(kernel, mean=np.mean(y), fit_mean=True,
+                           white_noise=np.log(np.mean(yerr)**2), fit_white_noise=True)
             gp.compute(cosmos, yerr)
-            #NEED TO FIX THIS. There is no more gp.optimize()
-            gp.optimize(cosmos, y, yerr, verbose=False)
+            def nll(p):
+                gp.set_parameter_vector(p)
+                ll = gp.lnlikelihood(y, quiet=True)
+                return -ll if np.isfinite(ll) else 1e25
+            def grad_nll(p):
+                gp.set_parameter_vector(p)
+                return -gp.grad_lnlikelihood(y, quiet=True)
+            p0 = gp.get_parameter_vector()
+            results = op.minimize(nll, p0, jac=grad_nll)
+            gp.set_parameter_vector(results.x)
             gplist.append(gp)
         self.gplist = gplist
         return
