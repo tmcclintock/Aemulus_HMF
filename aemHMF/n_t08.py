@@ -48,7 +48,6 @@ class n_t08(object):
         d,e,f,g = self.t08_params
         gamma_d2 = special.gamma(d*0.5)
         gamma_f2 = special.gamma(f*0.5)
-        log_g = np.log(g)
         gnd2 = g**(-d*0.5)
         gnf2 = g**(-f*0.5)
         ed = e**d
@@ -66,7 +65,10 @@ class n_t08(object):
         return
 
     def dndlM(self, M, a):
-        if self.a != a: self.merge_t08_params(a)
+        if self.a != a:
+            self.merge_t08_params(a)
+            self.calc_normalization() #Recalculate B
+            self.a = a
         sM = cc.sigmaMtophat(M, a)
         d,e,f,g = self.t08_params
         gsigma = self.B*((sM/e)**-d + sM**-f) * np.exp(-g/sM**2)
@@ -75,7 +77,7 @@ class n_t08(object):
         return gsigma * self.rhom * dlnsiginvdm
 
     def n_bin(self, Mlow, Mhigh, a):
-        M = np.logspace(np.log10(Mlow), np.log10(Mhigh), num=100, base=10)
+        M = np.logspace(np.log10(Mlow), np.log10(Mhigh), num=1000)
         lM = np.log(M)
         dndlM = np.array([self.dndlM(Mi, a) for Mi in M])
         spl = IUS(lM, dndlM)
