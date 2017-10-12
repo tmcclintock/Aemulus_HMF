@@ -15,19 +15,20 @@ rhocrit = 3.*(Mpcperkm*100)**2/(8*np.pi*G) #Msun h^2/Mpc^3
 
 class n_t08(object):
     
-    def __init__(self, cosmo_dict, a=1.0):
-        self.a = a
+    def __init__(self):
         self.t_08 = t08_emu.t08_emu()
-        self.set_cosmology(cosmo_dict)
 
     def set_cosmology(self, cosmo_dict):
         self.cosmo_dict = cosmo_dict
         self.rhom       = cosmo_dict['om']*rhocrit #Msun h^2/Mpc^3
+        print "setting cc cos:",cosmo_dict
         cc.set_cosmology(cosmo_dict)
+        print "sigma inside = ",cc.sigmaMtophat(1e14, 0.25)
         cos = self.cos_from_dict(cosmo_dict)
         self.t08_slopes_intercepts = self.t_08.predict_slopes_intercepts(cos)
-        self.merge_t08_params(self.a)
-        self.calc_normalization()
+        self.sigmaM_spline = cc.sigmaMtophat
+        #self.merge_t08_params(self.a)
+        #self.calc_normalization()
 
     def cos_from_dict(self, cosmo_dict):
         cd = cosmo_dict
@@ -57,23 +58,34 @@ class n_t08(object):
     def merge_t08_params(self, a):
         k = a-0.5
         d0,d1,f0,f1,g0,g1 = self.t08_slopes_intercepts
+        #print self.t08_slopes_intercepts, a
         d = d0 + k*d1
         e = np.array([1.0]) #Default Tinker08 value
         f = f0 + k*f1
         g = g0 + k*g1
+        #print k, a, d0, d1, d
+        print "in merge",a, d ,e, f, g
         self.t08_params = np.array([d, e, f, g]).flatten()
         return
 
     def dndlM(self, M, a):
+        if not hasattr(self, "a"):
+            self.a = a
+            self.merge_t08_params(a)
+            self.calc_normalization() #Recalculate B
         if self.a != a:
             self.merge_t08_params(a)
             self.calc_normalization() #Recalculate B
-            self.a = a
-        sM = cc.sigmaMtophat(M, a)
+        sM = self.sigmaM_spline(M,a)
+        #sM = cc.sigmaMtophat(M, a)
         d,e,f,g = self.t08_params
+        #print "in dndlm",a, d ,e, f, g
+        #sys.exit()
         gsigma = self.B*((sM/e)**-d + sM**-f) * np.exp(-g/sM**2)
         dM = 1e-6*M
-        dlnsiginvdm = np.log(cc.sigmaMtophat(M-dM/2, a)/cc.sigmaMtophat(M+dM/2, a))/dM
+        #dlnsiginvdm = np.log(cc.sigmaMtophat(M-dM/2, a)/cc.sigmaMtophat(M+dM/2, a))/dM
+        dlnsiginvdm = np.log(self.sigmaM_spline(M-dM/2, a)/self.sigmaM_spline(M+dM/2, a))/dM
+
         return gsigma * self.rhom * dlnsiginvdm
 
     def n_bin(self, Mlow, Mhigh, a):
@@ -91,7 +103,8 @@ def peak_height(M, a):
 
 if __name__ == "__main__":
     cd = {"om":0.3,"ob":0.05,"ol":1.-0.3,"ok":0.0,"h":0.7,"s8":0.77,"ns":0.96,"w0":-1.0,"wa":0.0,"Neff":3.0}
-    n = n_t08(cd)
+    n = n_t08()
+    n.set_cosmology(cd)
     V = 1050.**3
     M = np.logspace(12, 16, num=100, base=10)
 

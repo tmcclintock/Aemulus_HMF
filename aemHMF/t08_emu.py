@@ -8,6 +8,7 @@ import numpy as np
 import scipy.optimize as op
 import os
 data_path = os.path.dirname(os.path.abspath(inspect.stack()[0][1]))+"/data_files/"
+#data_path = "../../fit_mass_functions/output/dfg_rotated/"
 R_matrix_path = data_path+"R_matrix.txt"
 means_path    = data_path+"rotated_dfg_means.txt"
 vars_path     = data_path+"rotated_dfg_vars.txt"
@@ -35,8 +36,7 @@ class t08_emu(object):
         gplist = []
         for i in range(N_emus):
             y, yerr = means[:, i], errs[:, i]
-            #NEED TO FIX THIS. There is no more white kernel
-            kernel = 1.*george.kernels.ExpSquaredKernel(lguess, ndim=N_params)#+george.kernels.WhiteKernel(1, ndim=N_params)
+            kernel = george.kernels.ExpSquaredKernel(lguess, ndim=N_params)
             gp = george.GP(kernel, mean=np.mean(y), fit_mean=True,
                            white_noise=np.log(np.mean(yerr)**2), fit_white_noise=True)
             gp.compute(cosmos, yerr)
@@ -58,6 +58,8 @@ class t08_emu(object):
         x = np.atleast_2d(cosmo)
         y = self.means.T
         params = np.array([gp.predict(yi, x)[0] for yi,gp in zip(y, self.gplist)])
+        print cosmo
+        print params.flatten()
         return np.dot(self.R, params).flatten()
 
 if __name__ == "__main__":

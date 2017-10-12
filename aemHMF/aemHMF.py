@@ -14,10 +14,11 @@ cd = {"om":0.3,"ob":0.05,"ol":1.-0.3,"ok":0.0,"h":0.7,"s8":0.77,"ns":0.96,"w0":-
 class Aemulus_HMF(object):
     
     def __init__(self):
-        self.n_t08 = n_t08.n_t08(cd)
+        self.n_t08 = None#n_t08.n_t08(cd)
         self.f = f_gp.f_gp()
 
     def set_cosmology(self, cosmo_dict):
+        self.n_t08 = n_t08.n_t08()
         self.n_t08.set_cosmology(cosmo_dict)
 
     def n_bin(self, Mlow, Mhigh, a, with_f=True):
