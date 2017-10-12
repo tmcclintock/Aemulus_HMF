@@ -27,7 +27,7 @@ if __name__ == "__main__":
     f, axarr = plt.subplots(2, sharex=True)
     sfs = AD.get_scale_factors()
     for i in range(len(sfs)):
-        if i > 0: continue
+        #if i < 2: continue
         a = sfs[i]
         snap = i
         path = AD.path_to_building_box_data(box, snap)
