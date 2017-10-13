@@ -58,8 +58,6 @@ class t08_emu(object):
         x = np.atleast_2d(cosmo)
         y = self.means.T
         params = np.array([gp.predict(yi, x)[0] for yi,gp in zip(y, self.gplist)])
-        print cosmo
-        print params.flatten()
         return np.dot(self.R, params).flatten()
 
 if __name__ == "__main__":

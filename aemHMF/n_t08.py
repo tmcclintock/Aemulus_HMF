@@ -21,15 +21,11 @@ class n_t08(object):
     def set_cosmology(self, cosmo_dict):
         self.cosmo_dict = cosmo_dict
         self.rhom       = cosmo_dict['om']*rhocrit #Msun h^2/Mpc^3
-        print "setting cc cos:",cosmo_dict
         cc.set_cosmology(cosmo_dict)
-        print "sigma inside = ",cc.sigmaMtophat(1e14, 0.25)
         cos = self.cos_from_dict(cosmo_dict)
         self.t08_slopes_intercepts = self.t_08.predict_slopes_intercepts(cos)
-        self.sigmaM_spline = cc.sigmaMtophat
-        #self.merge_t08_params(self.a)
-        #self.calc_normalization()
-
+        cc.sigmaMtophat
+        
     def cos_from_dict(self, cosmo_dict):
         cd = cosmo_dict
         om = cd['om']
@@ -58,13 +54,11 @@ class n_t08(object):
     def merge_t08_params(self, a):
         k = a-0.5
         d0,d1,f0,f1,g0,g1 = self.t08_slopes_intercepts
-        #print self.t08_slopes_intercepts, a
         d = d0 + k*d1
         e = np.array([1.0]) #Default Tinker08 value
         f = f0 + k*f1
         g = g0 + k*g1
-        #print k, a, d0, d1, d
-        print "in merge",a, d ,e, f, g
+        #print "in merge",a, d ,e, f, g
         self.t08_params = np.array([d, e, f, g]).flatten()
         return
 
@@ -76,16 +70,12 @@ class n_t08(object):
         if self.a != a:
             self.merge_t08_params(a)
             self.calc_normalization() #Recalculate B
-        sM = self.sigmaM_spline(M,a)
-        #sM = cc.sigmaMtophat(M, a)
+        sM = cc.sigmaMtophat(M, a)
         d,e,f,g = self.t08_params
-        #print "in dndlm",a, d ,e, f, g
-        #sys.exit()
         gsigma = self.B*((sM/e)**-d + sM**-f) * np.exp(-g/sM**2)
         dM = 1e-6*M
-        #dlnsiginvdm = np.log(cc.sigmaMtophat(M-dM/2, a)/cc.sigmaMtophat(M+dM/2, a))/dM
-        dlnsiginvdm = np.log(self.sigmaM_spline(M-dM/2, a)/self.sigmaM_spline(M+dM/2, a))/dM
-
+        dlnsiginvdm = np.log(cc.sigmaMtophat(M-dM/2, a)/cc.sigmaMtophat(M+dM/2, a))/dM
+        #dlnsiginvdm = np.log(self.sigmaM_spline(M-dM/2, a)/self.sigmaM_spline(M+dM/2, a))/dM
         return gsigma * self.rhom * dlnsiginvdm
 
     def n_bin(self, Mlow, Mhigh, a):

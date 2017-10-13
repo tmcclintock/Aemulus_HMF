@@ -18,6 +18,8 @@ class Aemulus_HMF(object):
         self.f = f_gp.f_gp()
 
     def set_cosmology(self, cosmo_dict):
+        #This is a requirement for now
+        cosmo_dict["wa"] = 0.0
         self.n_t08 = n_t08.n_t08()
         self.n_t08.set_cosmology(cosmo_dict)
 
