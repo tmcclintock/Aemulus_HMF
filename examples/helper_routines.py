@@ -4,7 +4,7 @@ get the cosmology, get redshifts, etc.
 """
 import numpy as np
 import matplotlib.pyplot as plt
-import sys, os, emulator
+import sys, os#, emulator
 
 #Paths to the building boxes
 base = "../../../all_MF_data/building_data/"#"../Mass-Function-Emulator/test_data/"

@@ -35,9 +35,14 @@ if __name__ == "__main__":
         cov = np.loadtxt(covpath)
         err = np.sqrt(np.diag(cov))
 
-        N_aem = hmf.n_bins(M_bins, a, with_f=False)*Volume
+        N_aem = hmf.n_bins(M_bins, a, with_f=True)*Volume
         pdiff = (N-N_aem)/N_aem
         pdiff_err = err/N_aem
+
+        icov = np.linalg.inv(cov)
+        X = N - N_aem
+        chi2 = np.dot(X, np.dot(icov, X))
+        print "chi2(%d) = %.2f"%(snapshot, chi2)
     
         axarr[0].errorbar(M, N, err, ls='', marker='.', c=colors[snapshot], label=r"$z=%.2f$"%z)
         axarr[0].loglog(M, N_aem, ls='-', c=colors[snapshot])
