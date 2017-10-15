@@ -6,16 +6,30 @@ To do this, we can create an aemHMF object that we call with the flag: with_f=Fa
 """
 import aemHMF
 import numpy as np
-#Helper_routines contains some routines that are useful
-#only on my local machines
-import helper_routines as HR
+#Got rid of the "helper_routines" dependence since I can now use the
+#Aemulus_data package.
+import aemulus_data as AD
 
-scale_factors, zs = HR.get_sf_and_redshifts()
+scale_factors = AD.get_scale_factors()
+zs = 1./scale_factors - 1.
 Volume = 1050.**3 #Mpc/h ^3
 
-def get_residuals(boxnum, snapnum, hmf):
+def get_residuals(box, snapnum, hmf):
     a = scale_factors[snapnum]
-    cdict = HR.get_cosmo_dict(boxnum)
+    Ombh2, Omch2, w, ns, ln10As, H0, Neff, sig8 = np.genfromtxt(AD.path_to_building_box_cosmologies())[box]
+    h = H0/100.
+    Ob = Ombh2/h**2
+    Oc = Omch2/h**2
+    Om = Ob + Oc
+    cosmo = {"om":Om, "ob":Ob, "ol":1-Om, "h":h, "s8":sig8, "ns":ns, "w0":w, "Neff":Neff}
+
+    hmf = aemHMF.Aemulus_HMF()
+    hmf.set_cosmology(cosmo)
+    
+    path = AD.path_to_building_box_data(box, snapshot)
+    lMlo, lMhi, N, Mtot = np.genfromtxt(path, unpack=True)
+    M_bins = 10**np.array([lMlo, lMhi]).T
+
     lMbins, lM, N, err, cov = HR.get_sim_data(boxnum, snapnum)
     M = 10**lM #Msun/h
     Mbins = 10**lMbins #Msun/h
