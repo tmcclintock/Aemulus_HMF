@@ -7,7 +7,7 @@ plt.rc("text", usetex=True)
 
 if __name__ == "__main__":
     Volume = 1050.**3 #Mpc^3/h^3
-    box = 39
+    box = 0
     Ombh2, Omch2, w, ns, ln10As, H0, Neff, sig8 = np.genfromtxt(AD.path_to_building_box_cosmologies())[box]
     h = H0/100.
     Ob = Ombh2/h**2
@@ -35,7 +35,7 @@ if __name__ == "__main__":
         cov = np.loadtxt(covpath)
         err = np.sqrt(np.diag(cov))
 
-        N_aem = hmf.n_bins(M_bins, a, with_f=True)*Volume
+        N_aem = hmf.n_bins(M_bins, a, with_f=False)*Volume
         pdiff = (N-N_aem)/N_aem
         pdiff_err = err/N_aem
 
