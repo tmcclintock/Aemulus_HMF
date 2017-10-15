@@ -14,8 +14,8 @@ scale_factors = AD.get_scale_factors()
 zs = 1./scale_factors - 1.
 Volume = 1050.**3 #Mpc/h ^3
 
-def get_residuals(box, snapnum, hmf):
-    a = scale_factors[snapnum]
+def get_residuals(box, snapshot, hmf):
+    a = scale_factors[snapshot]
     Ombh2, Omch2, w, ns, ln10As, H0, Neff, sig8 = np.genfromtxt(AD.path_to_building_box_cosmologies())[box]
     h = H0/100.
     Ob = Ombh2/h**2
@@ -28,25 +28,25 @@ def get_residuals(box, snapnum, hmf):
     
     path = AD.path_to_building_box_data(box, snapshot)
     lMlo, lMhi, N, Mtot = np.genfromtxt(path, unpack=True)
-    M_bins = 10**np.array([lMlo, lMhi]).T
+    M = Mtot/N
+    Mbins = 10**np.array([lMlo, lMhi]).T
 
-    lMbins, lM, N, err, cov = HR.get_sim_data(boxnum, snapnum)
-    M = 10**lM #Msun/h
-    Mbins = 10**lMbins #Msun/h
+    covpath = AD.path_to_building_box_covariance(box, snapshot)
+    cov = np.loadtxt(covpath)
+    err = np.sqrt(np.diag(cov))
 
-    hmf.set_cosmology(cdict)
     nt08 = hmf.n_bins(Mbins, a, with_f=False)
     Nt08 = nt08*Volume
     Residual = (N-Nt08)/Nt08
     Residerr = err/Nt08
 
     #Make arrays of everything that we want to return
-    z = np.ones_like(lM)*zs[snapnum]
+    z = np.ones_like(N)*zs[snapshot]
     nu = np.array([aemHMF.peak_height(Mi, a) for Mi in M])
-    boxnum_arr  = np.ones_like(lM)*boxnum
-    snapnum_arr = np.ones_like(lM)*boxnum
+    boxnum_arr  = np.ones_like(N)*box
+    snapnum_arr = np.ones_like(N)*box
 
-    return z, lM, nu, Residual, Residerr, boxnum_arr, snapnum_arr
+    return z, np.log10(M), nu, Residual, Residerr, boxnum_arr, snapnum_arr
 
 if __name__ == "__main__":
     hmf = aemHMF.Aemulus_HMF()
