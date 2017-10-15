@@ -15,6 +15,8 @@ scale_factors = AD.get_scale_factors()
 zs = 1./scale_factors - 1.
 Volume = 1050.**3 #Mpc/h ^3
 
+with_f = True
+
 def get_residuals(box, snapshot, hmf):
     a = scale_factors[snapshot]
     
@@ -27,7 +29,7 @@ def get_residuals(box, snapshot, hmf):
     cov = np.loadtxt(covpath)
     err = np.sqrt(np.diag(cov))
 
-    nt08 = hmf.n_bins(Mbins, a, with_f=False)
+    nt08 = hmf.n_bins(Mbins, a, with_f=with_f)
     Nt08 = nt08*Volume
     Residual = (N-Nt08)/Nt08
     Residerr = err/Nt08
@@ -79,7 +81,8 @@ if __name__ == "__main__":
             print "done with ",i,j
         #plt.show()
     out = np.array([z_arr, lM_arr, nu_arr, Residuals, Resid_err, boxnum_arr, snapnum_arr]).T
-    np.savetxt("R_T08.txt", out)
+    if with_f: np.savetxt("R_f.txt", out)
+    else: np.savetxt("R_T08.txt", out)
     print "done"
             
     
