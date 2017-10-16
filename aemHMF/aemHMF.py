@@ -32,7 +32,7 @@ class Aemulus_HMF(object):
         f, fcov = self.f.predict_f(nu, np.ones_like(nu)*z)
         return n_t08*(1+f)
 
-    def n_bins(self, Mbins, a, with_f=True, with_scatter=False):
+    def n_bins(self, Mbins, a, with_f=False, with_scatter=False):
         n_t08 = self.n_t08.n_bins(Mbins, a)
         if not with_f: return n_t08
         M = np.mean(Mbins, 1)
@@ -40,7 +40,7 @@ class Aemulus_HMF(object):
         z = 1-1./a
         if not with_scatter: f, cov = self.f.predict_f(nu, np.ones_like(nu)*z)
         else: f = self.f.sample_f(nu, np.ones_like(nu)*z)
-        return n_t08*(1.-f)
+        return n_t08*(1.+f)
 
     def f_scatter(self, Mbins, a, N_samples):
         z = 1-1./a
