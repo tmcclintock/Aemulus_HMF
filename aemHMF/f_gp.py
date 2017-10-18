@@ -11,7 +11,7 @@ Rt08_path = data_path+"/data_files/R_T08.txt"
 zs, lMs, nus, R, Re, box, snap = np.genfromtxt(Rt08_path, unpack=True)
 
 
-#GP_parameters, computed ahead of time
+#GP_parameters, computed ahead of time. This needs to be recomputed.
 k = 9.44e-4
 metric = [0.537, 0.81318]
 
