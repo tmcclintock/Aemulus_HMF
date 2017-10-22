@@ -25,17 +25,25 @@ if __name__ == "__main__":
 
     plt.axhline(0, ls='-', c='k')
     inds = (box==0)*(snap==9)
-    sample_variance = 1./np.sqrt(N[inds])
+    shot = 1./np.sqrt(N[inds])
+    sample = err[inds]/N[inds]* np.sqrt(5.)
     xi = x[inds]
-    plt.plot(xi, sample_variance, ls='--', marker='', c='k', label=r"$1/\sqrt{N}$ at z=0")
-    plt.plot(xi, -sample_variance, ls='--', marker='', c='k')
+    plt.plot(xi, shot, ls='--', marker='', c='k', label=r"$1/\sqrt{N}$ at z=0")
+    plt.plot(xi, -shot, ls='--', marker='', c='k')
+    plt.plot(xi, sample, ls=':', marker='', c='k', label=r"$\sigma\sqrt{5}/N$ at z=0")
+    plt.plot(xi, -sample, ls=':', marker='', c='k')
+
     
     inds = (box==0)*(snap==2)
-    print snap
-    sample_variance = 1./np.sqrt(N[inds])
+    shot = 1./np.sqrt(N[inds])
+    sample = err[inds]/N[inds]
     xi = x[inds]
-    plt.plot(xi, sample_variance, ls=':', marker='', c='k', label=r"$1/\sqrt{N}$ at z=1")
-    plt.plot(xi, -sample_variance, ls=':', marker='', c='k')
+    """
+    plt.plot(xi, shot, ls='--', marker='', c='gray', label=r"$1/\sqrt{N}$ at z=1")
+    plt.plot(xi, -shot, ls='--', marker='', c='gray')
+    plt.plot(xi, sample, ls=':', marker='', c='gray', label=r"$\sigma/N$ at z=1")
+    plt.plot(xi, -sample, ls=':', marker='', c='gray')
+    """
 
     
     ylim = .1
