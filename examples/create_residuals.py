@@ -14,8 +14,9 @@ zs = 1./scale_factors - 1.
 Volume = 1050.**3 #Mpc/h ^3
 
 with_f = False
+Rmatrix = np.loadtxt("../aemHMF/data_files/R_matrix.txt")
 
-def get_residuals(box, snapshot, hmf, building_boxes=True):
+def get_residuals(box, snapshot, hmf, building_boxes=True, bf=False):
     if building_boxes:
         path = AD.path_to_building_box_data(box, snapshot)
         covpath = AD.path_to_building_box_covariance(box, snapshot)
@@ -35,6 +36,11 @@ def get_residuals(box, snapshot, hmf, building_boxes=True):
     cov = np.loadtxt(covpath)
     err = np.sqrt(np.diag(cov))
     err = err[good]
+
+    if bf:
+        bfparams = np.loadtxt("../aemHMF/data_files/rotated_dfg_means.txt")[box]
+        hmf.n_t08.t08_slopes_intercepts = np.dot(Rmatrix, bfparams).flatten()
+        hmf.n_t08.merge_t08_params(a)
     
     nt08 = hmf.n_bins(Mbins, a, with_f=with_f)
     Nt08 = nt08*Volume
@@ -49,7 +55,7 @@ def get_residuals(box, snapshot, hmf, building_boxes=True):
 
     return z, np.log10(M), nu, Residual, Residerr, N, err, Nt08, boxnum_arr, snapnum_arr
 
-def get_all_residuals(building_box=True):
+def get_all_residuals(building_box=True, bf=False):
     if building_box:
         N_boxes = 40
         cospath = AD.path_to_building_box_cosmologies()
@@ -60,6 +66,11 @@ def get_all_residuals(building_box=True):
         cospath = AD.path_to_test_box_cosmologies()
         outpath = "test_residuals.txt"
         if with_f: outpath = "test_residuals_f.txt"
+    if bf:
+        print "Working with best fits"
+        N_boxes = 40
+        cospath =  AD.path_to_building_box_cosmologies()
+        outpath = "bestfit_residuals.txt"
     N_snaps = 10
     hmf = aemHMF.Aemulus_HMF()
     z_arr = np.array([])
@@ -80,9 +91,8 @@ def get_all_residuals(building_box=True):
         Om = Ob + Oc
         cosmo = {"om":Om, "ob":Ob, "ol":1-Om, "h":h, "s8":sig8, "ns":ns, "w0":w, "Neff":Neff}
         hmf.set_cosmology(cosmo)
-        #fig, axarr = plt.subplots(2, sharex=True)
         for j in range(N_snaps):
-            z, lM, nu, R, eR, N, err, Nt08, box, snap = get_residuals(i, j, hmf, building_box)
+            z, lM, nu, R, eR, N, err, Nt08, box, snap = get_residuals(i, j, hmf, building_box, bf)
             z_arr = np.concatenate([z_arr, z])
             lM_arr = np.concatenate([lM_arr, lM])
             nu_arr = np.concatenate([nu_arr, nu])
@@ -96,9 +106,10 @@ def get_all_residuals(building_box=True):
             print "Residuals made for the box at ",i,j
     out = np.array([z_arr, lM_arr, nu_arr, Residuals, Resid_err, N_arr, err_arr, Nt08_arr, boxnum_arr, snapnum_arr]).T
     np.savetxt(outpath, out)
-    print "done, with_f = ",with_f, " building_box = ",building_box
+    print "done, with_f = ",with_f, " building_box = ",building_box, " bestfits = ",bf
     
     
 if __name__ == "__main__":
     #get_all_residuals(building_box=True)
-    get_all_residuals(building_box=False)
+    #get_all_residuals(building_box=False)
+    get_all_residuals(building_box=True, bf=True)
