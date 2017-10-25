@@ -65,7 +65,7 @@ if __name__ == "__main__":
     axarr[1].set_ylim(-plim, plim)
     plt.subplots_adjust(hspace=0, wspace=0, left=0.18, bottom=0.15)
     axarr[0].legend(loc=0, frameon=0, fontsize=8)
-    axarr[1].set_xlabel(r"Mass $[{\rm M_\odot}/h]$")
+    axarr[1].set_xlabel(r"Mass $[{\rm M_\odot} h^{-1}]$")
     axarr[1].set_ylabel(r"$\Delta N/N_{emu}$")
     axarr[0].set_ylabel(r"Number")
     xlim = axarr[1].get_xlim()

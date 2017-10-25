@@ -31,7 +31,7 @@ if __name__ == "__main__":
         print "Box %d"%box
 
     plt.legend(loc=0, frameon=0, fontsize=10)
-    plt.xlabel(r"Mass $[{\rm M_\odot}/h]$")
+    plt.xlabel(r"Mass $[{\rm M_\odot} h^{-1}]$")
     plt.ylabel(r"$\Delta N/N_{emu}$")
     plt.ylabel(r"Number")
     plt.ylim(1, 5e5)
@@ -39,5 +39,5 @@ if __name__ == "__main__":
     plt.fill_between(xlim, -0.01, 0.01, color="gray", alpha=0.2)
     plt.xlim(xlim)
     plt.subplots_adjust(bottom=0.15)
-    #plt.gcf().savefig("collage_figure.pdf")
+    plt.gcf().savefig("collage_figure.pdf")
     plt.show()
