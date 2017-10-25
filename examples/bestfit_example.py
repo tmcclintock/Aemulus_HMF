@@ -30,7 +30,7 @@ if __name__ == "__main__":
     zs = 1./sfs - 1
     colors = [plt.get_cmap("seismic")(ci) for ci in np.linspace(1.0, 0.0, len(sfs))]
     for snapshot in range(len(sfs)):
-        if snapshot < 2: continue
+        if snapshot < 0: continue
         a = sfs[snapshot]
         z = zs[snapshot]
         path = AD.path_to_building_box_data(box, snapshot)
@@ -51,7 +51,7 @@ if __name__ == "__main__":
         chi2 = np.dot(X, np.dot(icov, X))
         print "chi2(%d) = %.2f"%(snapshot, chi2)
 
-        if snapshot == 2 or snapshot == 5 or snapshot == 9:
+        if snapshot in [0, 2, 5, 9]:
             axarr[0].errorbar(M, N, err, ls='', marker='.', c=colors[snapshot], label=r"$z=%.2f$"%z)
         else:
             axarr[0].errorbar(M, N, err, ls='', marker='.', c=colors[snapshot])
@@ -71,5 +71,5 @@ if __name__ == "__main__":
     xlim = axarr[1].get_xlim()
     axarr[1].fill_between(xlim, -0.01, 0.01, color="gray", alpha=0.2)
     axarr[1].set_xlim(xlim)
-    #plt.gcf().savefig("bestfit_final.pdf")
+    plt.gcf().savefig("bestfit_final.pdf")
     plt.show()

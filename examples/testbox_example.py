@@ -25,7 +25,7 @@ if __name__ == "__main__":
     zs = 1./sfs - 1
     colors = [plt.get_cmap("seismic")(ci) for ci in np.linspace(1.0, 0.0, len(sfs))]
     for snapshot in range(len(sfs)):
-        if snapshot < 2: continue
+        if snapshot < 0: continue
         a = sfs[snapshot]
         z = zs[snapshot]
         path = AD.path_to_test_box_data(box, snapshot)
@@ -40,7 +40,7 @@ if __name__ == "__main__":
         pdiff = (N-N_aem)/N_aem
         pdiff_err = err/N_aem
 
-        if snapshot == 2 or snapshot == 5 or snapshot == 9:
+        if snapshot in [0, 2, 5, 9]:
             axarr[0].errorbar(M, N, err, ls='', marker='.', c=colors[snapshot], label=r"$z=%.2f$"%z)
         else:
             axarr[0].errorbar(M, N, err, ls='', marker='.', c=colors[snapshot])
@@ -52,7 +52,7 @@ if __name__ == "__main__":
     plim = 0.07
     axarr[1].set_ylim(-plim, plim)
     plt.subplots_adjust(hspace=0, wspace=0, left=0.18, bottom=0.15)
-    axarr[0].legend(loc=0, frameon=0, fontsize=14)
+    axarr[0].legend(loc="upper right", frameon=0, fontsize=12)
     axarr[1].set_xlabel(r"Mass $[{\rm M_\odot}/h]$")
     axarr[1].set_ylabel(r"$\Delta N/N_{emu}$")
     axarr[0].set_ylabel(r"Number")
