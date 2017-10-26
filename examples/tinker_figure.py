@@ -5,7 +5,16 @@ import aemulus_data as AD
 plt.rc("text", usetex=True)
 plt.rc("font", size=18)
 plt.rc('font', family='serif')
+import tinker_mass_function as TMF
 
+
+def get_tinker_lines(cosmo, M, a, Mbins):
+    z = 1./a - 1.
+    tmf = TMF.tinker_mass_function(cosmo, z)
+    lMbins = np.log10(Mbins)
+    return tmf.n_in_bins(lMbins)
+    
+    
 if __name__ == "__main__":
     Volume = 1050.**3 #Mpc^3/h^3
     box = 2
@@ -16,6 +25,7 @@ if __name__ == "__main__":
     Om = Ob + Oc
     
     cosmo = {"om":Om, "ob":Ob, "ol":1-Om, "h":h, "s8":sig8, "ns":ns, "w0":w, "Neff":Neff}
+
 
     hmf = aemHMF.Aemulus_HMF()
     hmf.set_cosmology(cosmo)
@@ -45,11 +55,20 @@ if __name__ == "__main__":
         else:
             axarr[0].errorbar(M, N, err, ls='', marker='.', c=colors[snapshot])
         axarr[0].loglog(M, N_aem, ls='-', c=colors[snapshot])
-        axarr[1].errorbar(M, pdiff, pdiff_err, c=colors[snapshot], ls='', marker='.')
+        #axarr[1].errorbar(M, pdiff, pdiff_err, c=colors[snapshot], ls='', marker='.')
+        axarr[1].plot(M, pdiff, c=colors[snapshot], ls='', marker='.')
+
+
+        #Get the Tinker lines
+        Nt = get_tinker_lines(cosmo, M, a, M_bins)*Volume
+        pd = (N - Nt)/Nt
+        axarr[1].plot(M, pd, c=colors[snapshot], ls='-', alpha=0.2)
+
+        
     axarr[1].axhline(0, c='k', ls='--')
     axarr[0].set_yscale('log')
     axarr[0].set_ylim(1, 1e6)
-    plim = 0.07
+    plim = 0.25
     axarr[1].set_ylim(-plim, plim)
     plt.subplots_adjust(hspace=0, wspace=0, left=0.18, bottom=0.15)
     axarr[0].legend(loc="upper right", frameon=0, fontsize=12)
@@ -59,5 +78,5 @@ if __name__ == "__main__":
     xlim = axarr[1].get_xlim()
     axarr[1].fill_between(xlim, -0.01, 0.01, color="gray", alpha=0.2)
     axarr[1].set_xlim(xlim)
-    plt.gcf().savefig("testbox_figure.pdf")
+    plt.gcf().savefig("tinker_figure.pdf")
     plt.show()

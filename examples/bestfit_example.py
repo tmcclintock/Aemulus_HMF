@@ -67,7 +67,7 @@ if __name__ == "__main__":
     axarr[0].legend(loc=0, frameon=0, fontsize=8)
     axarr[1].set_xlabel(r"Mass $[{\rm M_\odot} h^{-1}]$")
     axarr[1].set_ylabel(r"$\Delta N/N_{emu}$")
-    axarr[0].set_ylabel(r"Number")
+    axarr[0].set_ylabel(r"Number per bin")
     xlim = axarr[1].get_xlim()
     axarr[1].fill_between(xlim, -0.01, 0.01, color="gray", alpha=0.2)
     axarr[1].set_xlim(xlim)

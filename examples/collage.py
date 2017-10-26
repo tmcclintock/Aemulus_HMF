@@ -31,9 +31,10 @@ if __name__ == "__main__":
         print "Box %d"%box
 
     plt.legend(loc=0, frameon=0, fontsize=10)
-    plt.xlabel(r"Mass $[{\rm M_\odot} h^{-1}]$")
+    plt.xlabel(r"Mass $[{\rm M_\odot}\ h^{-1}]$")
     plt.ylabel(r"$\Delta N/N_{emu}$")
-    plt.ylabel(r"Number")
+    #plt.ylabel(r"Number $[({\rm Gpc}\ h^{-1})^{-3}\ \ln {\rm M_\odot}\ h^{-1}]$")
+    plt.ylabel(r"Number per bin")
     plt.ylim(1, 5e5)
     xlim = plt.gca().get_xlim()
     plt.fill_between(xlim, -0.01, 0.01, color="gray", alpha=0.2)
