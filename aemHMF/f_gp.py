@@ -44,7 +44,8 @@ class f_gp(object):
             x = np.atleast_2d([nu, z])
         else: #nu and z are arrays
             x = np.array([nu, z]).T
-        return self.gp.sample_conditional(self.R, x)
+        #return self.gp.sample_conditional(self.R, x)
+        return self.gp.sample_conditional(self.R*0, x)
 
 if __name__ == "__main__":
     f = f_gp()

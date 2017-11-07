@@ -27,7 +27,7 @@ if __name__ == "__main__":
     colors = [plt.get_cmap("seismic")(ci) for ci in np.linspace(1.0, 0.0, len(sfs))]
     for snapshot in range(len(sfs)):
         if snapshot < 2: continue
-        if snapshot in [2, 3, 4, 5, 6, 7]: continue
+        if snapshot in [3, 4, 5, 6, 7]: continue
         a = sfs[snapshot]
         z = zs[snapshot]
         path = AD.path_to_test_box_data(box, snapshot)
