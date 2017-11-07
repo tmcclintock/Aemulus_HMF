@@ -45,7 +45,6 @@ if __name__ == "__main__":
 
         Mf = np.logspace(np.log10(min(M)), np.log10(max(M)), num=100)
         fs = hmf.f_scatter(M, a, 30)
-        np.mean(fs)
         for i in range(len(fs)):
             Ns = N_aem*(1+fs[i])
             axarr[1].plot(M, (N-Ns)/Ns, c=colors[snapshot], alpha=0.2)
