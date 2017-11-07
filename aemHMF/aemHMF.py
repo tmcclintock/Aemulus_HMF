@@ -23,6 +23,9 @@ class Aemulus_HMF(object):
         self.n_t08 = n_t08.n_t08()
         self.n_t08.set_cosmology(cosmo_dict)
 
+    def dndlM(self, M, a):
+        return self.n_t08.dndlM(M, a)
+
     def n_bin(self, Mlow, Mhigh, a, with_f=False):
         n_t08 = self.n_t08.n_bin(Mlow, Mhigh, a)
         if not with_f: return n_t08
