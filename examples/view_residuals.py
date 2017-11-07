@@ -52,11 +52,22 @@ if __name__ == "__main__":
     if use_nu: x = nus
     else: x = lMs
     plt.plot(x, R, marker='.', ls='', markersize=1, c='b', label="Building boxes", alpha=0.4)
+    print "LOO residuals"
+    w = 1./Re**2
+    print np.mean(R), np.sum(w*R)/np.sum(w), np.sum(w*Re)/np.sum(w)
+    print np.mean(Re), np.sqrt(np.mean(Re**2))
+
+
 
     zs, lMs, nus, R, Re, N, err, Nt08, box, snap = get_resids("test_residuals.txt", use_nu)
     if use_nu: x = nus
     else: x = lMs
     plt.plot(x, R, marker='.', ls='', markersize=2, c='r', label="Test boxes", alpha=1)
+    w = 1./Re**2
+    print "Testbox residuals"
+    print np.mean(R), np.sum(w*R)/np.sum(w), np.sum(w*Re)/np.sum(w)
+    print np.mean(Re), np.sqrt(np.mean(Re**2))
+
     """
     print "test"
     ind = 61
@@ -70,8 +81,6 @@ if __name__ == "__main__":
     zs, lMs, nus, R, Re, N, err, Nt08, box, snap = get_resids("bestfit_residuals.txt", use_nu)
     Rvar = Re**2
     w = 1./Rvar
-    print np.mean(R), np.sum(w*R)/np.sum(w)
-    print np.mean(Re)
     if use_nu: x = nus
     else: x = lMs
     #plt.plot(x, R, marker='.', ls='', markersize=2, c='yellow', label="Best fits", alpha=1)

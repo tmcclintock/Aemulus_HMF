@@ -6,8 +6,7 @@ import matplotlib.pyplot as plt
 import aemulus_data as AD
 import aemHMF
 plt.rc("text", usetex=True)
-plt.rc("font", size=18)
-plt.rc("font", family="serif")
+plt.rc("font", size=24, family="serif")
 
 if __name__ == "__main__":
     fig, axes = plt.subplots(1, 2, sharey= True)
@@ -57,7 +56,7 @@ if __name__ == "__main__":
     
     ylim = .1
     plt.ylim(-ylim, ylim)
-    axes[0].legend(loc=0, frameon=False, fontsize=12)
+    axes[0].legend(loc=0, frameon=False, fontsize=16)
     axes[0].set_xlabel(r"$\nu$")
     axes[1].set_xlabel(r"Mass $[{\rm M_\odot}\ h^{-1}]$")
     axes[0].set_ylabel(r"$\frac{N-N_{emu}}{N_{emu}}$")

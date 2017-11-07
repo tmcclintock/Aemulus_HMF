@@ -10,9 +10,8 @@ data_path = os.path.dirname(os.path.abspath(inspect.stack()[0][1]))
 Rt08_path = data_path+"/data_files/R_T08.txt"
 zs, lMs, nus, R, Re, box, snap = np.genfromtxt(Rt08_path, unpack=True)
 
-
-#GP_parameters, computed ahead of time. This needs to be recomputed.
-k = 9.44e-4
+#GP_parameters, computed ahead of time.
+k = george.kernels.ConstantKernel(log_constant= -7.4627695322, ndim=2, axes=np.array([0, 1]))
 metric = [0.537, 0.81318]
 
 class f_gp(object):

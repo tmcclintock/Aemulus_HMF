@@ -9,7 +9,7 @@ plt.rc('font', family='serif')
 
 if __name__ == "__main__":
     Volume = 1050.**3 #Mpc^3/h^3
-    box = 1
+    box = 0
     Ombh2, Omch2, w, ns, ln10As, H0, Neff, sig8 = np.genfromtxt(AD.path_to_test_box_cosmologies())[box]
     h = H0/100.
     Ob = Ombh2/h**2
