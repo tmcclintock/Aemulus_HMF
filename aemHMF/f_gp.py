@@ -12,7 +12,7 @@ zs, lMs, nus, R, Re, box, snap = np.genfromtxt(Rt08_path, unpack=True)
 
 #GP_parameters, computed ahead of time.
 k = george.kernels.ConstantKernel(log_constant= -7.4627695322, ndim=2, axes=np.array([0, 1]))
-metric = [0.537, 0.81318]
+metric = [ 0.45806604,  1.2785944 ]
 
 class f_gp(object):
     
@@ -43,8 +43,8 @@ class f_gp(object):
             x = np.atleast_2d([nu, z])
         else: #nu and z are arrays
             x = np.array([nu, z]).T
-        #return self.gp.sample_conditional(self.R, x)
         return self.gp.sample_conditional(self.R*0, x)
+
 
 if __name__ == "__main__":
     f = f_gp()

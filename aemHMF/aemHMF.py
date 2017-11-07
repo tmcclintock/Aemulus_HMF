@@ -23,7 +23,7 @@ class Aemulus_HMF(object):
         self.n_t08 = n_t08.n_t08()
         self.n_t08.set_cosmology(cosmo_dict)
 
-    def n_bin(self, Mlow, Mhigh, a, with_f=True):
+    def n_bin(self, Mlow, Mhigh, a, with_f=False):
         n_t08 = self.n_t08.n_bin(Mlow, Mhigh, a)
         if not with_f: return n_t08
         M = np.mean(Mlow, Migh)
@@ -42,9 +42,8 @@ class Aemulus_HMF(object):
         else: f = self.f.sample_f(nu, np.ones_like(nu)*z)
         return n_t08*(1.+f)
 
-    def f_scatter(self, Mbins, a, N_samples):
+    def f_scatter(self, M, a, N_samples):
         z = 1-1./a
-        M = np.mean(Mbins, 1)
         nu = np.array([peak_height(Mi, a) for Mi in M])
         return np.array([self.f.sample_f(nu, np.ones_like(nu)*z) for i in range(N_samples)])
 
@@ -67,7 +66,7 @@ if __name__ == "__main__":
     plt.sca(axarr[0])
     plt.legend(loc=0, fontsize=14)
     axarr[1].scatter(Mave, (n-nt08)/nt08, c='k')
-    fs = hmf.f_scatter(Mbins, a, 50)
+    fs = hmf.f_scatter(M, a, 50)
     for i in range(len(fs)):
         ns = nt08*(1+fs[i])
         axarr[1].plot(Mave, (ns-nt08)/nt08, c='blue', alpha=0.2, zorder=-1)

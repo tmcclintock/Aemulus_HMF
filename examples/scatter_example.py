@@ -3,9 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import aemulus_data as AD
 plt.rc("text", usetex=True)
-plt.rc("font", size=18)
-plt.rc('font', family='serif')
-
+plt.rc("font", size=18, family='serif')
 
 if __name__ == "__main__":
     Volume = 1050.**3 #Mpc^3/h^3
@@ -26,28 +24,32 @@ if __name__ == "__main__":
     zs = 1./sfs - 1
     colors = [plt.get_cmap("seismic")(ci) for ci in np.linspace(1.0, 0.0, len(sfs))]
     for snapshot in range(len(sfs)):
-        if snapshot < 2: continue
-        if snapshot in [3, 4, 5, 6, 7]: continue
+        if snapshot in [0, 1, 3, 4, 5, 7, 8]: continue
         a = sfs[snapshot]
         z = zs[snapshot]
         path = AD.path_to_test_box_data(box, snapshot)
-        lMlo, lMhi, N, Mtot = np.genfromtxt(path, unpack=True)
+        data = np.genfromtxt(path)
+        N = data[:, 2]
+        inds = (N > 0)
+        data = data[inds]
+        lMlo, lMhi, N, Mtot  = data.T
         M_bins = 10**np.array([lMlo, lMhi]).T
         M = Mtot/N
         covpath = AD.path_to_test_box_covariance(box, snapshot)
         cov = np.loadtxt(covpath)
-        err = np.sqrt(np.diag(cov))
+        err = np.sqrt(np.diag(cov))[inds]
 
         N_aem = hmf.n_bins(M_bins, a, with_f=False)*Volume
         pdiff = (N-N_aem)/N_aem
         pdiff_err = err/N_aem
 
-        fs = hmf.f_scatter(M_bins, a, 10)
+        Mf = np.logspace(np.log10(min(M)), np.log10(max(M)), num=100)
+        fs = hmf.f_scatter(M, a, 30)
+        np.mean(fs)
         for i in range(len(fs)):
             Ns = N_aem*(1+fs[i])
-            #axarr[0].plot(M, Ns, ls=":", c=colors[snapshot], alpha=0.3)
-            axarr[1].plot(M, (N-Ns)/Ns, c=colors[snapshot], alpha=0.3)
-    
+            axarr[1].plot(M, (N-Ns)/Ns, c=colors[snapshot], alpha=0.2)
+            
         axarr[0].errorbar(M, N, err, ls='', marker='.', c=colors[snapshot], label=r"$z=%.2f$"%z)
         axarr[0].loglog(M, N_aem, ls='-', c=colors[snapshot])
         axarr[1].errorbar(M, pdiff, pdiff_err, c=colors[snapshot], ls='', marker='.')
@@ -58,9 +60,9 @@ if __name__ == "__main__":
     axarr[1].set_ylim(-plim, plim)
     plt.subplots_adjust(hspace=0, wspace=0, left=0.18, bottom=0.15)
     axarr[0].legend(loc=0, frameon=0, fontsize=14)
-    axarr[1].set_xlabel(r"Mass $[{\rm M_\odot}/h]$")
+    axarr[1].set_xlabel(r"Mass $[{\rm M_\odot}\ h^{-1}]$")
     axarr[1].set_ylabel(r"$\Delta N/N_{emu}$")
-    axarr[0].set_ylabel(r"Number")
+    axarr[0].set_ylabel(r"Number per bin")
     xlim = axarr[1].get_xlim()
     axarr[1].fill_between(xlim, -0.01, 0.01, color="gray", alpha=0.2)
     axarr[1].set_xlim(xlim)
