@@ -3,7 +3,7 @@ This contains the Aemulus HMF emulator.
 """
 import os, sys
 import n_t08
-import f_gp
+import residual_gp
 from n_t08 import peak_height
 import numpy as np
 
@@ -15,7 +15,7 @@ class Aemulus_HMF(object):
     
     def __init__(self):
         self.n_t08 = None#n_t08.n_t08(cd)
-        self.f = f_gp.f_gp()
+        self.residualgp = residual_gp.residual_gp()
 
     def set_cosmology(self, cosmo_dict):
         #This is a requirement for now
@@ -45,10 +45,10 @@ class Aemulus_HMF(object):
         else: f = self.f.sample_f(nu, np.ones_like(nu)*z)
         return n_t08*(1.+f)
 
-    def f_scatter(self, M, a, N_samples):
+    def residual_realization(self, M, a, N_samples):
         z = 1-1./a
         nu = np.array([peak_height(Mi, a) for Mi in M])
-        return np.array([self.f.sample_f(nu, np.ones_like(nu)*z) for i in range(N_samples)])
+        return np.array([self.residualgp.residual_realization(nu, np.ones_like(nu)*z) for i in range(N_samples)])
 
 if __name__ == "__main__":
     cd = {"om":0.3,"ob":0.05,"ol":1.-0.3,"ok":0.0,"h":0.7,"s8":0.77,"ns":0.96,"w0":-1.0,"wa":0.0,"Neff":3.0}
@@ -69,7 +69,7 @@ if __name__ == "__main__":
     plt.sca(axarr[0])
     plt.legend(loc=0, fontsize=14)
     axarr[1].scatter(Mave, (n-nt08)/nt08, c='k')
-    fs = hmf.f_scatter(M, a, 50)
+    fs = hmf.residual_realization(Mave, a, 50)
     for i in range(len(fs)):
         ns = nt08*(1+fs[i])
         axarr[1].plot(Mave, (ns-nt08)/nt08, c='blue', alpha=0.2, zorder=-1)

@@ -47,7 +47,7 @@ if __name__ == "__main__":
         fs = hmf.f_scatter(M, a, 30)
         for i in range(len(fs)):
             Ns = N_aem*(1+fs[i])
-            axarr[1].plot(M, (N-Ns)/Ns, c=colors[snapshot], alpha=0.2)
+            axarr[1].plot(M, (N-Ns)/N_aem, c=colors[snapshot], alpha=0.2)
             
         axarr[0].errorbar(M, N, err, ls='', marker='.', c=colors[snapshot], label=r"$z=%.2f$"%z)
         axarr[0].loglog(M, N_aem, ls='-', c=colors[snapshot])
@@ -57,14 +57,15 @@ if __name__ == "__main__":
     axarr[0].set_ylim(1, 1e6)
     plim = 0.07
     axarr[1].set_ylim(-plim, plim)
-    plt.subplots_adjust(hspace=0, wspace=0, left=0.18, bottom=0.15)
+    plt.subplots_adjust(hspace=0, wspace=0, left=0.2, bottom=0.15)
     axarr[0].legend(loc=0, frameon=0, fontsize=14)
     axarr[1].set_xlabel(r"Mass $[{\rm M_\odot}\ h^{-1}]$")
-    axarr[1].set_ylabel(r"$\Delta N/N_{emu}$")
+    #axarr[1].set_ylabel(r"$\Delta N/N_{emu}$")
+    axarr[1].set_ylabel(r"$\frac{N-N_{emu}(1+R_{GP})}{N_{emu}}$")
     axarr[0].set_ylabel(r"Number per bin")
     xlim = axarr[1].get_xlim()
     axarr[1].fill_between(xlim, -0.01, 0.01, color="gray", alpha=0.2)
     axarr[1].set_xlim(xlim)
-    #plt.gcf().savefig("scatter_figure.pdf")
+    plt.gcf().savefig("scatter_figure.pdf")
     plt.gcf().savefig("scatter_figure.png")
     plt.show()
