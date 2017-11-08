@@ -141,5 +141,5 @@ if __name__ == "__main__":
     """
 
     
-    plt.gcf().savefig("all_residuals.pdf")
+    plt.gcf().savefig("all_residuals.png")
     plt.show()

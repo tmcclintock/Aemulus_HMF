@@ -66,4 +66,5 @@ if __name__ == "__main__":
     axarr[1].fill_between(xlim, -0.01, 0.01, color="gray", alpha=0.2)
     axarr[1].set_xlim(xlim)
     #plt.gcf().savefig("scatter_figure.pdf")
+    plt.gcf().savefig("scatter_figure.png")
     plt.show()
