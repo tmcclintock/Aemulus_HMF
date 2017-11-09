@@ -22,8 +22,28 @@ class Aemulus_HMF(object):
         self.n_t08 = n_t08.n_t08()
         self.n_t08.set_cosmology(cosmo_dict)
 
+    def set_default_cosmology(self):
+        cd = {"om":0.3,"ob":0.05,"ol":1.-0.3,"ok":0.0,"h":0.7,"s8":0.77,"ns":0.96,"w0":-1.0,"wa":0.0,"Neff":3.0}
+        self.n_t08 = n_t08.n_t08()
+        self.n_t08.set_cosmology(cd)
+
+    def Mtosigma(self, M, a):
+        if type(M) is list or type(M) is np.ndarray:
+            return np.array([self.n_t08.Mtosigma(Mi, a) for Mi in M])
+        else:
+            return self.n_t08.Mtosigma(M, a)
+
+    def multiplicity(self, M, a):
+        if type(M) is list or type(M) is np.ndarray:
+            return np.array([self.n_t08.Gsigma(Mi, a) for Mi in M])
+        else:
+            return self.n_t08.Gsigma(M, a)
+
     def dndlM(self, M, a):
-        return self.n_t08.dndlM(M, a)
+        if type(M) is list or type(M) is np.ndarray:
+            return np.array([self.n_t08.dndlM(Mi, a) for Mi in M])
+        else:        
+            return self.n_t08.dndlM(M, a)
 
     def n_bin(self, Mlow, Mhigh, a):
         return self.n_t08.n_bin(Mlow, Mhigh, a)
@@ -37,10 +57,9 @@ class Aemulus_HMF(object):
         return np.array([self.residualgp.residual_realization(nu, np.ones_like(nu)*z) for i in range(Nrealizations)])
 
 if __name__ == "__main__":
-    cosmo_dictionary = {"om":0.3,"ob":0.05,"ol":1.-0.3,"ok":0.0,"h":0.7,"s8":0.77,"ns":0.96,"w0":-1.0,"wa":0.0,"Neff":3.0}
     a = 1.0 #Scale factor
     hmf = Aemulus_HMF()
-    hmf.set_cosmology(cosmo_dictionary)
+    hmf.set_default_cosmology()
     Medges = np.logspace(11, 16, num=11)
     Mbins = np.array([Medges[:-1], Medges[1:]]).T
     M = np.mean(Mbins, 1)

@@ -62,7 +62,11 @@ class n_t08(object):
         self.t08_params = np.array([d, e, f, g]).flatten()
         return
 
-    def dndlM(self, M, a):
+    def Mtosigma(self, M, a):
+        return cc.sigmaMtophat(M, a)
+
+
+    def Gsigma(self, M, a):
         if not hasattr(self, "a"):
             self.a = a
             self.merge_t08_params(a)
@@ -72,10 +76,12 @@ class n_t08(object):
             self.calc_normalization() #Recalculate B
         sM = cc.sigmaMtophat(M, a)
         d,e,f,g = self.t08_params
-        gsigma = self.B*((sM/e)**-d + sM**-f) * np.exp(-g/sM**2)
+        return self.B*((sM/e)**-d + sM**-f) * np.exp(-g/sM**2)
+
+    def dndlM(self, M, a):
+        gsigma = self.Gsigma(M, a)
         dM = 1e-6*M
         dlnsiginvdm = np.log(cc.sigmaMtophat(M-dM/2, a)/cc.sigmaMtophat(M+dM/2, a))/dM
-        #dlnsiginvdm = np.log(self.sigmaM_spline(M-dM/2, a)/self.sigmaM_spline(M+dM/2, a))/dM
         return gsigma * self.rhom * dlnsiginvdm
 
     def n_bin(self, Mlow, Mhigh, a):
