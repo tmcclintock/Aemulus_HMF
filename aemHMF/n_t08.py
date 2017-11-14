@@ -24,7 +24,6 @@ class n_t08(object):
         cc.set_cosmology(cosmo_dict)
         cos = self.cos_from_dict(cosmo_dict)
         self.t08_slopes_intercepts = self.t_08.predict_slopes_intercepts(cos)
-        cc.sigmaMtophat
         
     def cos_from_dict(self, cosmo_dict):
         cd = cosmo_dict
@@ -65,8 +64,7 @@ class n_t08(object):
     def Mtosigma(self, M, a):
         return cc.sigmaMtophat(M, a)
 
-
-    def Gsigma(self, M, a):
+    def Gsigma(self, sigma, a):
         if not hasattr(self, "a"):
             self.a = a
             self.merge_t08_params(a)
@@ -74,12 +72,22 @@ class n_t08(object):
         if self.a != a:
             self.merge_t08_params(a)
             self.calc_normalization() #Recalculate B
-        sM = cc.sigmaMtophat(M, a)
         d,e,f,g = self.t08_params
-        return self.B*((sM/e)**-d + sM**-f) * np.exp(-g/sM**2)
+        return self.B*((sigma/e)**-d + sigma**-f) * np.exp(-g/sigma**2)
+
+    def GM(self, M, a):
+        if not hasattr(self, "a"):
+            self.a = a
+            self.merge_t08_params(a)
+            self.calc_normalization() #Recalculate B
+        if self.a != a:
+            self.merge_t08_params(a)
+            self.calc_normalization() #Recalculate B
+        sigma = self.Mtosigma(M, a)
+        return self.Gsigma(sigma, a)
 
     def dndlM(self, M, a):
-        gsigma = self.Gsigma(M, a)
+        gsigma = self.GM(M, a)
         dM = 1e-6*M
         dlnsiginvdm = np.log(cc.sigmaMtophat(M-dM/2, a)/cc.sigmaMtophat(M+dM/2, a))/dM
         return gsigma * self.rhom * dlnsiginvdm

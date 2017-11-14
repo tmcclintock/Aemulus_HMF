@@ -35,9 +35,16 @@ class Aemulus_HMF(object):
 
     def multiplicity(self, M, a):
         if type(M) is list or type(M) is np.ndarray:
-            return np.array([self.n_t08.Gsigma(Mi, a) for Mi in M])
+            return np.array([self.n_t08.GM(Mi, a) for Mi in M])
         else:
-            return self.n_t08.Gsigma(M, a)
+            return self.n_t08.GM(M, a)
+
+    def multiplicity_sigma(self, sigma, a):
+        if type(sigma) is list or type(sigma) is np.ndarray:
+            return np.array([self.n_t08.Gsigma(sigmai, a) for sigmai in sigma])
+        else:
+            return self.n_t08.Gsigma(sigma, a)
+
 
     def dndlM(self, M, a):
         if type(M) is list or type(M) is np.ndarray:
