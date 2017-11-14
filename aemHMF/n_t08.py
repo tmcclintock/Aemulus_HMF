@@ -70,6 +70,7 @@ class n_t08(object):
             self.merge_t08_params(a)
             self.calc_normalization() #Recalculate B
         if self.a != a:
+            self.a = a
             self.merge_t08_params(a)
             self.calc_normalization() #Recalculate B
         d,e,f,g = self.t08_params
@@ -81,6 +82,7 @@ class n_t08(object):
             self.merge_t08_params(a)
             self.calc_normalization() #Recalculate B
         if self.a != a:
+            self.a = a
             self.merge_t08_params(a)
             self.calc_normalization() #Recalculate B
         sigma = self.Mtosigma(M, a)

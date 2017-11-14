@@ -17,28 +17,24 @@ Oc = Omch2/h**2
 Om = Ob + Oc
 default_cosmo = {"om":Om, "ob":Ob, "ol":1-Om, "h":h, "s8":sig8, "ns":ns, "w0":w, "Neff":Neff} #Default cosmology
 
-def function_of_z():
-    Ombh2, Omch2, w, ns, ln10As, H0, Neff, sig8 = np.genfromtxt(AD.path_to_test_box_cosmologies())[box]
+def function_of_z(ax):
     cosmo = default_cosmo.copy()
     hmf = aemHMF.Aemulus_HMF()
     hmf.set_cosmology(cosmo)
     
     sigma = np.linspace(1, 6, num=30)
-    Gz0 = hmf.multiplicity_sigma(sigma, 1.0)
-    for a in [0.5, 0.33333333, 0.25]:
+    nu = deltac/sigma
+    Gz0 = hmf.multiplicity_sigma(sigma, 0.5)
+    for a in [1.0, 2./3., 0.5, 1./3., 0.25]:
         z = 1./a - 1
         G = hmf.multiplicity_sigma(sigma, a)
-        nu = deltac/sigma
         Y = (G-Gz0)/Gz0
-        plt.plot(M, Y, label=r"$z=%.1f$"%z)
+        ax.plot(nu, Y, label=r"$z=%.1f$"%z)
         print "z = %f done"%z
-    plt.title(r"$M_{low}$=%.1e  $M_{high}$=%.1e"%(min(M), max(M)))
-    plt.ylabel(r"$\frac{G(z) - G(z=0)}{G(z=0)}$")
-    plt.xlabel(r"$\nu$")
-    plt.xlabel(r"Mass [M$_\odot\ h^{-1}$]")
-    plt.xscale('log')
-    plt.legend(loc="upper left", frameon=False)
-    plt.show()
+    #plt.title(r"$M_{low}$=%.1e  $M_{high}$=%.1e"%(min(M), max(M)))
+    #plt.ylabel(r"$\frac{G(\sigma) - G(\sigma)_{fid}}{G(\sigma)_{fid}}$")
+    ax.set_xlabel(r"$\nu$")
+    ax.legend(loc="upper left", frameon=False, fontsize=12)
 
 def function_of_Omegam(ax):
     hmf = aemHMF.Aemulus_HMF()
@@ -88,11 +84,12 @@ def function_of_sigma8(ax):
     ax.legend(loc="upper left", frameon=False, fontsize=12)
 
 if __name__ == "__main__":
-    fig, axes = plt.subplots(1, 2, sharey=True)
+    fig, axes = plt.subplots(1, 3, sharey=True)
     function_of_Omegam(axes[0])
-    function_of_sigma8(axes[1])
+    function_of_sigma8(axes[2])
+    function_of_z(axes[1])
     plt.subplots_adjust(wspace=0, bottom=0.15, left=0.15)
-    fig.set_size_inches(8, 4)
+    fig.set_size_inches(10, 4)
     #fig.savefig("multiplicity_figure.png")
-    #fig.savefig("multiplicity_figure.pdf")
+    fig.savefig("multiplicity_figure.pdf")
     plt.show()
