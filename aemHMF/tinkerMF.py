@@ -1,7 +1,6 @@
 """
 This file contains the actual Tinker08 mass function. It uses t08_emu to get the mass function parameters.
 """
-#Public modules
 import cosmocalc as cc
 import numpy as np
 from scipy import special, integrate
@@ -13,14 +12,14 @@ G = 4.51701e-48 #Newton's gravitional constant in Mpc^3/s^2/Solar Mass
 Mpcperkm = 3.24077927001e-20 #Mpc/km; used to convert H0 to s^-1
 rhocrit = 3.*(Mpcperkm*100)**2/(8*np.pi*G) #Msun h^2/Mpc^3
 
-class n_t08(object):
+class tinkerMF(object):
     
     def __init__(self):
         self.t_08 = t08_emu.t08_emu()
 
     def set_cosmology(self, cosmo_dict):
         self.cosmo_dict = cosmo_dict
-        self.rhom       = cosmo_dict['om']*rhocrit #Msun h^2/Mpc^3
+        self.rhom = cosmo_dict['om']*rhocrit #Msun h^2/Mpc^3
         cc.set_cosmology(cosmo_dict)
         cos = self.cos_from_dict(cosmo_dict)
         self.t08_slopes_intercepts = self.t_08.predict_slopes_intercepts(cos)
@@ -108,10 +107,9 @@ def peak_height(M, a):
     return 1.686/cc.sigmaMtophat(M, a)
 
 if __name__ == "__main__":
-    cd = {"om":0.3,"ob":0.05,"ol":1.-0.3,"ok":0.0,"h":0.7,"s8":0.77,"ns":0.96,"w0":-1.0,"wa":0.0,"Neff":3.0}
-    n = n_t08()
-    n.set_cosmology(cd)
-    V = 1050.**3
+    cos = {"om":0.3,"ob":0.05,"ol":1.-0.3,"ok":0.0,"h":0.7,"s8":0.77,"ns":0.96,"w0":-1.0,"wa":0.0,"Neff":3.0}
+    n = tinkerMF()
+    n.set_cosmology(cos)
     M = np.logspace(12, 16, num=100, base=10)
 
     import matplotlib.pyplot as plt
@@ -120,8 +118,9 @@ if __name__ == "__main__":
         a = 1./(1.+i)
         c = (1-a)/2
         dndlM = np.array([n.dndlM(Mi, a) for Mi in M])
-        plt.loglog(M, dndlM, c=cmap(c))
+        plt.loglog(M, dndlM, c=cmap(c), label="z=%.1f"%i)
     plt.ylim(1e-12, 1e-1)
+    plt.legend(loc=0)
     plt.show()
     plt.clf()
 
@@ -132,6 +131,6 @@ if __name__ == "__main__":
         a = 1./(1.+i)
         c = (1-a)/2
         number = np.array([n.n_bin(Mbi[0], Mbi[1], a) for Mbi in Mbins])
-        plt.loglog(Mave, number*V, c=cmap(c))
-    plt.ylim(1e0, 1e8)
+        plt.loglog(Mave, number, c=cmap(c), label="z=%.1f"%i)
+    plt.legend(loc=0)    
     plt.show()
