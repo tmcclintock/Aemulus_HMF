@@ -8,7 +8,7 @@ plt.rc('font', family='serif')
 
 if __name__ == "__main__":
     Volume = 1050.**3 #Mpc^3/h^3
-    box = 2
+    box = 0
     Ombh2, Omch2, w, ns, ln10As, H0, Neff, sig8 = np.genfromtxt(AD.path_to_test_box_cosmologies())[box]
     h = H0/100.
     Ob = Ombh2/h**2
@@ -16,7 +16,7 @@ if __name__ == "__main__":
     Om = Ob + Oc
     
     cosmo = {"om":Om, "ob":Ob, "ol":1-Om, "h":h, "s8":sig8, "ns":ns, "w0":w, "Neff":Neff}
-
+    print cosmo
     hmf = aemHMF.Aemulus_HMF()
     hmf.set_cosmology(cosmo)
     
@@ -25,18 +25,17 @@ if __name__ == "__main__":
     zs = 1./sfs - 1
     colors = [plt.get_cmap("seismic")(ci) for ci in np.linspace(1.0, 0.0, len(sfs))]
     for snapshot in range(len(sfs)):
-        if snapshot < 0: continue
+        if snapshot < 9: continue
         a = sfs[snapshot]
         z = zs[snapshot]
-        path = AD.path_to_test_box_data(box, snapshot)
-        lMlo, lMhi, N, Mtot = np.genfromtxt(path, unpack=True)
+        print a, Volume
+        lMlo, lMhi, N, Mtot = AD.get_test_box_binned_mass_function(box, snapshot).T
         M_bins = 10**np.array([lMlo, lMhi]).T
         M = Mtot/N
-        covpath = AD.path_to_test_box_covariance(box, snapshot)
-        cov = np.loadtxt(covpath)
+        cov = AD.get_test_box_binned_mass_function_covariance(box, snapshot)
         err = np.sqrt(np.diag(cov))
 
-        N_aem = hmf.n_bins(M_bins, a, with_f=False)*Volume
+        N_aem = hmf.n_bins(M_bins, a)*Volume
         pdiff = (N-N_aem)/N_aem
         pdiff_err = err/N_aem
 
@@ -51,13 +50,13 @@ if __name__ == "__main__":
     axarr[0].set_ylim(1, 1e6)
     plim = 0.07
     axarr[1].set_ylim(-plim, plim)
-    plt.subplots_adjust(hspace=0, wspace=0, left=0.18, bottom=0.15)
     axarr[0].legend(loc="upper right", frameon=0, fontsize=12)
     axarr[1].set_xlabel(r"Mass $[{\rm M_\odot} h^{-1}]$")
-    axarr[1].set_ylabel(r"$\Delta N/N_{emu}$")
+    axarr[1].set_ylabel(r"$\frac{N-N_{emu}}{N_{emu}}$")
     axarr[0].set_ylabel(r"Number per bin")
     xlim = axarr[1].get_xlim()
     axarr[1].fill_between(xlim, -0.01, 0.01, color="gray", alpha=0.2)
     axarr[1].set_xlim(xlim)
-    plt.gcf().savefig("testbox_figure.pdf")
+    plt.subplots_adjust(hspace=0, wspace=0, left=0.2, bottom=0.15)
+    #plt.gcf().savefig("testbox_figure.pdf")
     plt.show()

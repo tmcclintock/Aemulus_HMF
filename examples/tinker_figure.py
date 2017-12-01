@@ -3,8 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import aemulus_data as AD
 plt.rc("text", usetex=True)
-plt.rc("font", size=18)
-plt.rc('font', family='serif')
+plt.rc("font", size=18, family='serif')
 import tinker_mass_function as TMF
 
 
@@ -46,8 +45,8 @@ if __name__ == "__main__":
         cov = np.loadtxt(covpath)
         err = np.sqrt(np.diag(cov))
 
-        N_aem = hmf.n_bins(M_bins, a, with_f=False)*Volume
-        pdiff = (N_aem-N)/N_aem
+        N_aem = hmf.n_bins(M_bins, a)*Volume
+        pdiff = (N-N_aem)/N_aem
         pdiff_err = err/N_aem
 
         if snapshot in [0, 2, 5, 9]:
@@ -73,7 +72,7 @@ if __name__ == "__main__":
     plt.subplots_adjust(hspace=0, wspace=0, left=0.18, bottom=0.15)
     axarr[0].legend(loc="upper right", frameon=0, fontsize=12)
     axarr[1].set_xlabel(r"Mass $[{\rm M_\odot} h^{-1}]$")
-    axarr[1].set_ylabel(r"$(N_{emu}-N)/N_{emu}$")
+    axarr[1].set_ylabel(r"$\frac{N-N_{model}}{N_{model}}$")
     axarr[0].set_ylabel(r"Number per bin")
     axarr[0].set_ylabel(r"Number of halos")
 

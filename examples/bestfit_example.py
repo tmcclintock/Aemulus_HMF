@@ -42,7 +42,7 @@ if __name__ == "__main__":
         err = np.sqrt(np.diag(cov))
 
         hmf.n_t08.merge_t08_params(a)
-        N_aem = hmf.n_bins(M_bins, a, with_f=False)*Volume
+        N_aem = hmf.n_bins(M_bins, a)*Volume
         pdiff = (N-N_aem)/N_aem
         pdiff_err = err/N_aem
 
@@ -63,13 +63,13 @@ if __name__ == "__main__":
     axarr[0].set_ylim(1, 1e6)
     plim = 0.07
     axarr[1].set_ylim(-plim, plim)
-    plt.subplots_adjust(hspace=0, wspace=0, left=0.18, bottom=0.15)
     axarr[0].legend(loc=0, frameon=0, fontsize=8)
     axarr[1].set_xlabel(r"Mass $[{\rm M_\odot} h^{-1}]$")
-    axarr[1].set_ylabel(r"$\Delta N/N_{emu}$")
+    axarr[1].set_ylabel(r"$\frac{N-N_{fit}}{N_{fit}}$")
     axarr[0].set_ylabel(r"Number per bin")
     xlim = axarr[1].get_xlim()
     axarr[1].fill_between(xlim, -0.01, 0.01, color="gray", alpha=0.2)
     axarr[1].set_xlim(xlim)
+    plt.subplots_adjust(hspace=0, wspace=0, left=0.20, bottom=0.15)
     plt.gcf().savefig("bestfit_final.pdf")
     plt.show()
