@@ -7,16 +7,11 @@ import residual_gp
 from tinkerMF import peak_height
 import numpy as np
 
-#This is the format the cosmological dictionary should take.
-cd = {"om":0.3,"ob":0.05,"ol":1.-0.3,"ok":0.0,"h":0.7,"s8":0.77,"ns":0.96,"w0":-1.0,"Neff":3.0}# "wa":0.0 is assumed internally
-
-
 class Aemulus_HMF(object):
 
     #This is the format the cosmological dictionary should take.
     defaul_cosmology = {"om":0.3,"ob":0.05,"ol":1.-0.3,"ok":0.0,"h":0.7,"s8":0.77,"ns":0.96,"w0":-1.0,"Neff":3.0}# "wa":0.0 is assumed internally
 
-    
     def __init__(self):
         self.tinkerMF = None
         self.residualgp = residual_gp.residual_gp()

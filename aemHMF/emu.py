@@ -3,10 +3,9 @@ This contains the code necessary to predict the Tinker08 MF parameters.
 It does not contain the code for the mass function itself.
 """
 import george
-import inspect
+import os, inspect
 import numpy as np
 import scipy.optimize as op
-import os
 data_path = os.path.dirname(os.path.abspath(inspect.stack()[0][1]))+"/data_files/"
 #data_path = "../../fit_mass_functions/output/dfg_rotated/"
 R_matrix_path = data_path+"R_matrix.txt"
@@ -19,7 +18,7 @@ cosmos = np.delete(cosmos, 4, 1)  #ln10As
 N_cosmos = len(cosmos)
 N_params = len(cosmos[0])
 
-class t08_emu(object):
+class emu(object):
 
     def __init__(self):
         self.R      = np.genfromtxt(R_matrix_path)
@@ -61,6 +60,6 @@ class t08_emu(object):
         return np.dot(self.R, params).flatten()
 
 if __name__ == "__main__":
-    t = t08_emu()
+    t = emu()
     cos = cosmos[0]
     print t.predict_slopes_intercepts(cos)

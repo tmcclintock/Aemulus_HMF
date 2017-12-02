@@ -1,11 +1,11 @@
 """
-This file contains the actual Tinker08 mass function. It uses t08_emu to get the mass function parameters.
+This file contains the actual Tinker08 mass function. It uses emu to get the mass function parameters.
 """
 import cosmocalc as cc
 import numpy as np
 from scipy import special, integrate
 from scipy.interpolate import InterpolatedUnivariateSpline as IUS
-import t08_emu
+import emu
 
 #Physical constants
 G = 4.51701e-48 #Newton's gravitional constant in Mpc^3/s^2/Solar Mass
@@ -15,7 +15,7 @@ rhocrit = 3.*(Mpcperkm*100)**2/(8*np.pi*G) #Msun h^2/Mpc^3
 class tinkerMF(object):
     
     def __init__(self):
-        self.t_08 = t08_emu.t08_emu()
+        self.t_08 = emu.emu()
 
     def set_cosmology(self, cosmo_dict):
         self.cosmo_dict = cosmo_dict
