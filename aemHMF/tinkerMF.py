@@ -3,9 +3,12 @@ This file contains the actual Tinker08 mass function. It uses emu to get the mas
 """
 import cosmocalc as cc
 from classy import Class
+from cluster_toolkit import bias
 import numpy as np
 from scipy import special, integrate
 from scipy.interpolate import InterpolatedUnivariateSpline as IUS
+from scipy.interpolate import RectBivariateSpline as RBS
+#from scipy.interpolate import interp2d as RBS
 import emu
 
 #Physical constants
@@ -25,22 +28,38 @@ class tinkerMF(object):
             cc.set_cosmology(cosmo_dict)
         else:
             params = {
-            'output': 'mPk', #linear only
-            'h': cosmo_dict['h'],
-            'sigma8': cosmo_dict['s8'],
-            'n_s': cosmo_dict['ns'],
-            'w0_fld': cosmo_dict['w0'],
-            'wa_fld': 0.0,
-            'Omega_b': cosmo_dict['ob'],
-            'Omega_cdm': cosmo_dict['om'] - cosmo_dict['ob'],
-            'Omega_Lambda': 1.- cosmo_dict['om'],
-            'N_eff':cosmo_dict['Neff'],
-            'P_k_max_1/Mpc':10.,
-            'z_max_pk':10.
+                'output': 'mPk', #linear only
+                'h': cosmo_dict['h'],
+                'sigma8': cosmo_dict['s8'],
+                'n_s': cosmo_dict['ns'],
+                'w0_fld': cosmo_dict['w0'],
+                'wa_fld': 0.0,
+                'Omega_b': cosmo_dict['ob'],
+                'Omega_cdm': cosmo_dict['om'] - cosmo_dict['ob'],
+                'Omega_Lambda': 1.- cosmo_dict['om'],
+                'N_eff':cosmo_dict['Neff'],
+                'P_k_max_1/Mpc':10.,
+                'z_max_pk':10.
             }
             self.classcosmo = Class()
             self.classcosmo.set(params)
             self.classcosmo.compute()
+            Nm = 100
+            Nz = 10
+            M = np.logspace(11, 17, num=Nm) #Msun/h
+            R = self.MtoR(M) #Mpc already
+            z = np.linspace(0, 3, num=Nz)
+            sigmas = np.zeros((Nz, Nm))
+            for i in range(Nz):
+                #sigmas[i] = np.array([self.classcosmo.sigma(Ri, z[i]) for Ri in R])
+                h = self.cosmo_dict['h']
+                k = np.logspace(-5, 1, num=1000) #h Mpc^-1
+                p = np.array([self.classcosmo.pk_lin(ki, 1./a-1.) for ki in k])*h**3 #Mpc^3/h^3
+                sigmas[i] = np.sqrt(bias.sigma2_at_M(M, k/h, p, self.cosmo_dict['om']))
+            #self.sigma_spl = RBS(z, np.log(M), np.log(sigmas.T)) #If using interp2d
+            self.sigma_spl = RBS(z, np.log(M), np.log(sigmas)) #If using RBS for real
+
+            
         self.usecc = usecc
         cos = self.cos_from_dict(cosmo_dict)
         self.t08_slopes_intercepts = self.t_08.predict_slopes_intercepts(cos)
@@ -88,7 +107,8 @@ class tinkerMF(object):
         if self.usecc:
             return cc.sigmaMtophat(M, a)
         else:
-            return self.classcosmo.sigma(self.MtoR(M), 1./a-1.)
+            #return np.exp(self.sigma_spl(1./a-1, np.log(M))[0]) #If using interp2d
+            return np.exp(self.sigma_spl(1./a-1, np.log(M))[0][0]) #If using RBS for real
         
     def Gsigma(self, sigma, a):
         if not hasattr(self, "a"):
@@ -118,10 +138,6 @@ class tinkerMF(object):
         gsigma = self.GM(M, a)
         dM = 1e-6*M
         dlnsiginvdm = np.log(self.Mtosigma(M-dM/2,a)/self.Mtosigma(M+dM/2, a))/dM
-        #if self.usecc:
-        #    dlnsiginvdm = np.log(cc.sigmaMtophat(M-dM/2, a)/cc.sigmaMtophat(M+dM/2, a))/dM
-        #else:
-        #    dlnsiginvdm = np.log(self.classcosmo.sigma(self.MtoR(M-dM/2), 1./a-1)/self.classcosmo.sigma(self.MtoR(M+dM/2), 1./a-1))/dM
         return gsigma * self.rhom * dlnsiginvdm
 
     def n_bin(self, Mlow, Mhigh, a):
@@ -140,10 +156,10 @@ def peak_height(M, a):
 if __name__ == "__main__":
     cos = {"om":0.3,"ob":0.05,"ol":1.-0.3,"ok":0.0,"h":0.7,"s8":0.77,"ns":0.96,"w0":-1.0,"wa":0.0,"Neff":3.0}
     n = tinkerMF()
-    M = np.logspace(12, 16, num=100)
+    M = np.logspace(12, 16, num=10)
 
-    import matplotlib.pyplot as plt
-    for i in range(3):
+    #import matplotlib.pyplot as plt
+    for i in xrange(0,4):
         a = 1./(1.+i)
         c = (1-a)/2
         n.set_cosmology(cos, usecc=True)
@@ -153,24 +169,14 @@ if __name__ == "__main__":
         dndlMcl = np.array([n.dndlM(Mi, a) for Mi in M])
         #print dndlMcl
         dif = (dndlMcl-dndlMcc)/dndlMcl
-        plt.plot(M, dif, label="z=%d"%i)
-        #for Mi, d in zip(M, dif):
-        #    print Mi, d
-    plt.legend(loc=0)
-    plt.xscale('log')
-    plt.xlabel("Mass")
-    plt.ylabel("$(n_{class}-n_{cc})/n_{class})$")
-    plt.show()
-
-    """
-    M = np.logspace(11, 16, num=11, base=10)
-    Mbins = np.array([M[:-1], M[1:]]).T
-    Mave = np.mean(Mbins, 1)
-    for i in range(3):
-        a = 1./(1.+i)
-        c = (1-a)/2
-        number = np.array([n.n_bin(Mbi[0], Mbi[1], a) for Mbi in Mbins])
-        plt.loglog(Mave, number, c=cmap(c), label="z=%.1f"%i)
-    plt.legend(loc=0)    
-    plt.show()
-    """
+        #print dif
+        #plt.plot(M, dif, label="z=%d"%i)
+        #plt.loglog(M, dndlMcc, label="z=%d"%i)
+        #plt.loglog(M, dndlMcl, label="z=%d"%i, ls=':')
+        for Mi, d in zip(M, dif):
+            print Mi, d
+    #plt.legend(loc=0)
+    #plt.xscale('log')
+    #plt.xlabel("Mass")
+    #plt.ylabel("$(n_{class}-n_{cc})/n_{class})$")
+    #plt.show()
