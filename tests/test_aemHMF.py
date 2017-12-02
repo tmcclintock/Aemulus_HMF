@@ -1,6 +1,7 @@
 import pytest
 import aemHMF as amf
-import numpy
+import numpy as np
+import numpy.testing as npt
 
 def test_test():
     assert hasattr(amf, "emu")
