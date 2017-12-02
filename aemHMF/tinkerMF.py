@@ -2,14 +2,15 @@
 This file contains the actual Tinker08 mass function. It uses emu to get the mass function parameters.
 """
 import cosmocalc as cc
+from classy import Class
 import numpy as np
 from scipy import special, integrate
 from scipy.interpolate import InterpolatedUnivariateSpline as IUS
 import emu
 
 #Physical constants
-G = 4.51701e-48 #Newton's gravitional constant in Mpc^3/s^2/Solar Mass
-Mpcperkm = 3.24077927001e-20 #Mpc/km; used to convert H0 to s^-1
+G = 4.51715e-48 #Newton's gravitional constant in Mpc^3/s^2/Solar Mass
+Mpcperkm = 3.240779289664256e-20 #Mpc/km; used to convert H0 to s^-1
 rhocrit = 3.*(Mpcperkm*100)**2/(8*np.pi*G) #Msun h^2/Mpc^3
 
 class tinkerMF(object):
@@ -17,10 +18,30 @@ class tinkerMF(object):
     def __init__(self):
         self.t_08 = emu.emu()
 
-    def set_cosmology(self, cosmo_dict):
+    def set_cosmology(self, cosmo_dict, usecc=True):
         self.cosmo_dict = cosmo_dict
         self.rhom = cosmo_dict['om']*rhocrit #Msun h^2/Mpc^3
-        cc.set_cosmology(cosmo_dict)
+        if usecc:
+            cc.set_cosmology(cosmo_dict)
+        else:
+            params = {
+            'output': 'mPk', #linear only
+            'h': cosmo_dict['h'],
+            'sigma8': cosmo_dict['s8'],
+            'n_s': cosmo_dict['ns'],
+            'w0_fld': cosmo_dict['w0'],
+            'wa_fld': 0.0,
+            'Omega_b': cosmo_dict['ob'],
+            'Omega_cdm': cosmo_dict['om'] - cosmo_dict['ob'],
+            'Omega_Lambda': 1.- cosmo_dict['om'],
+            'N_eff':cosmo_dict['Neff'],
+            'P_k_max_1/Mpc':10.,
+            'z_max_pk':10.
+            }
+            self.classcosmo = Class()
+            self.classcosmo.set(params)
+            self.classcosmo.compute()
+        self.usecc = usecc
         cos = self.cos_from_dict(cosmo_dict)
         self.t08_slopes_intercepts = self.t_08.predict_slopes_intercepts(cos)
         
@@ -60,9 +81,15 @@ class tinkerMF(object):
         self.t08_params = np.array([d, e, f, g]).flatten()
         return
 
-    def Mtosigma(self, M, a):
-        return cc.sigmaMtophat(M, a)
+    def MtoR(self, M):
+        return (M/(4./3.*np.pi*self.rhom))**(1./3.)/self.cosmo_dict['h'] #Lagrangian radius in Mpc
 
+    def Mtosigma(self, M, a):
+        if self.usecc:
+            return cc.sigmaMtophat(M, a)
+        else:
+            return self.classcosmo.sigma(self.MtoR(M), 1./a-1.)
+        
     def Gsigma(self, sigma, a):
         if not hasattr(self, "a"):
             self.a = a
@@ -90,7 +117,11 @@ class tinkerMF(object):
     def dndlM(self, M, a):
         gsigma = self.GM(M, a)
         dM = 1e-6*M
-        dlnsiginvdm = np.log(cc.sigmaMtophat(M-dM/2, a)/cc.sigmaMtophat(M+dM/2, a))/dM
+        dlnsiginvdm = np.log(self.Mtosigma(M-dM/2,a)/self.Mtosigma(M+dM/2, a))/dM
+        #if self.usecc:
+        #    dlnsiginvdm = np.log(cc.sigmaMtophat(M-dM/2, a)/cc.sigmaMtophat(M+dM/2, a))/dM
+        #else:
+        #    dlnsiginvdm = np.log(self.classcosmo.sigma(self.MtoR(M-dM/2), 1./a-1)/self.classcosmo.sigma(self.MtoR(M+dM/2), 1./a-1))/dM
         return gsigma * self.rhom * dlnsiginvdm
 
     def n_bin(self, Mlow, Mhigh, a):
@@ -109,21 +140,29 @@ def peak_height(M, a):
 if __name__ == "__main__":
     cos = {"om":0.3,"ob":0.05,"ol":1.-0.3,"ok":0.0,"h":0.7,"s8":0.77,"ns":0.96,"w0":-1.0,"wa":0.0,"Neff":3.0}
     n = tinkerMF()
-    n.set_cosmology(cos)
-    M = np.logspace(12, 16, num=100, base=10)
+    M = np.logspace(12, 16, num=100)
 
     import matplotlib.pyplot as plt
-    cmap = plt.get_cmap("brg")
     for i in range(3):
         a = 1./(1.+i)
         c = (1-a)/2
-        dndlM = np.array([n.dndlM(Mi, a) for Mi in M])
-        plt.loglog(M, dndlM, c=cmap(c), label="z=%.1f"%i)
-    plt.ylim(1e-12, 1e-1)
+        n.set_cosmology(cos, usecc=True)
+        dndlMcc = np.array([n.dndlM(Mi, a) for Mi in M])
+        #print dndlMcc
+        n.set_cosmology(cos, usecc=False)
+        dndlMcl = np.array([n.dndlM(Mi, a) for Mi in M])
+        #print dndlMcl
+        dif = (dndlMcl-dndlMcc)/dndlMcl
+        plt.plot(M, dif, label="z=%d"%i)
+        #for Mi, d in zip(M, dif):
+        #    print Mi, d
     plt.legend(loc=0)
+    plt.xscale('log')
+    plt.xlabel("Mass")
+    plt.ylabel("$(n_{class}-n_{cc})/n_{class})$")
     plt.show()
-    plt.clf()
 
+    """
     M = np.logspace(11, 16, num=11, base=10)
     Mbins = np.array([M[:-1], M[1:]]).T
     Mave = np.mean(Mbins, 1)
@@ -134,3 +173,4 @@ if __name__ == "__main__":
         plt.loglog(Mave, number, c=cmap(c), label="z=%.1f"%i)
     plt.legend(loc=0)    
     plt.show()
+    """
