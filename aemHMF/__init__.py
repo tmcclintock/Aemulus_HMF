@@ -77,12 +77,8 @@ if __name__ == "__main__":
     n = hmf.n_bins(Mbins, z)
     fs = hmf.residual_realization(M, z, 50)
     print n
-    """
-    import matplotlib.pyplot as plt
-    fig, axarr = plt.subplots(2, sharex=True)
-    axarr[0].loglog(M, n)
-    for i in range(len(fs)):
-        ns = n*(1+fs[i])
-        axarr[1].plot(M, (n-ns)/ns, alpha=0.2)
-    plt.show()
-    """
+
+    def wrapper():
+        n = hmf.n_bins(Mbins, z)
+    import timeit
+    print timeit.timeit(wrapper, number=10)
