@@ -8,7 +8,7 @@ from scipy import special, integrate
 from scipy.interpolate import InterpolatedUnivariateSpline as IUS
 from scipy.interpolate import RectBivariateSpline as RBS
 #from scipy.interpolate import interp2d as RBS
-import emu
+import emu, sys
 
 #Physical constants
 G = 4.51715e-48 #Newton's gravitional constant in Mpc^3/s^2/Solar Mass
@@ -105,11 +105,9 @@ class tinkerMF(object):
 
     def n_bin(self, Mlow, Mhigh, z):
         M = np.logspace(np.log10(Mlow), np.log10(Mhigh), num=100)
-        lM = np.log(M)
-        dndlM = self.dndlM(M, z)
-        spl = IUS(lM, dndlM)
-        return spl.integral(np.log(Mlow), np.log(Mhigh))
-
+        dndM = self.dndlM(M, z)/M
+        return massfunction.n_in_bin(Mlow, Mhigh, M, dndM)
+        
     def n_bins(self, Mbins, z):
         return np.array([self.n_bin(Mbi[0], Mbi[1], z) for Mbi in Mbins])
     
@@ -131,6 +129,8 @@ if __name__ == "__main__":
     n = tinkerMF()
     n.set_cosmology(cos)
     M = np.logspace(12, 16, num=20)
+    Mbins = np.array([M[:-1], M[1:]]).T
+    print n.n_bins(Mbins, 0)*1e9 #1 Gpc cube
     import matplotlib.pyplot as plt
     for i in xrange(0,1):
         z = float(i)
