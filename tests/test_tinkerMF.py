@@ -3,14 +3,7 @@ import numpy as np
 import numpy.testing as npt
 from aemHMF import tinkerMF as tmf
 
-cos = {"Omega_m":0.3,
-       "Omega_b":0.05,
-       "h":0.7,
-       "sigma8":0.8,
-       "n_s":0.96,
-       "w0":-1.0,
-       "N_eff":3.0,
-       "wa":0.0} #This is a requirement
+cos = {"Omega_m":0.3, "Omega_b":0.05, "h":0.7, "A_s":2.19e-9, "sigma8":0.8, "n_s":0.96, "w0":-1.0, "N_eff":3.0146, "wa":0.0}
 
 mf = tmf.tinkerMF()
 mf.set_cosmology(cos)
@@ -30,11 +23,17 @@ def test_tinkerMF():
     assert hasattr(mf, 'n_bin')
     assert hasattr(mf, 'n_bins')
     
-def test_dndlm_mass_dependence():
+def test_dndlM_mass_dependence():
     for z in zs:
-        dndlM = np.array([mf.dndlM(Mi, z) for Mi in M])
+        dndlM = mf.dndlM(M, z)
         npt.assert_array_less(dndlM[1:], dndlM[:-1])
 
+def test_dndlM_single_vs_array():
+    z = zs[0]
+    arr = mf.dndlM(M, z)
+    arr2 = np.array([mf.dndlM(Mi, z) for Mi in M])
+    npt.assert_array_equal(arr, arr2)
+    
 def test_bin_mass_dependence():
     for z in zs:
         n = mf.n_bins(Mbins, z)
@@ -51,3 +50,8 @@ def test_sf_dependence():
         n1 = mf.n_bins(Mbins, zs[i]) #higher z
         n2 = mf.n_bins(Mbins, zs[i+1]) #lower z
         npt.assert_array_less(n1/n1, n2/n1)
+
+if __name__ == "__main__":
+    import timeit
+    print timeit.timeit(test_dndlM_mass_dependence, number=1)
+    print timeit.timeit(test_dndlM_single_vs_array, number=1)
