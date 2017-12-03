@@ -4,7 +4,6 @@ This contains the Aemulus HMF emulator.
 import os, sys
 import tinkerMF
 import residual_gp
-from tinkerMF import peak_height
 import numpy as np
 
 class Aemulus_HMF(object):
@@ -58,7 +57,7 @@ class Aemulus_HMF(object):
 
     def residual_realization(self, M, a, Nrealizations=1):
         z = 1-1./a
-        nu = np.array([peak_height(Mi, a) for Mi in M])
+        nu = np.array([self.tinkerMF.peak_height(Mi, a) for Mi in M])
         return np.array([self.residualgp.residual_realization(nu, np.ones_like(nu)*z) for i in range(Nrealizations)])
 
 if __name__ == "__main__":

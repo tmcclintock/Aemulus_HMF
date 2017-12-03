@@ -21,7 +21,7 @@ class tinkerMF(object):
     def __init__(self):
         self.t_08 = emu.emu()
 
-    def set_cosmology(self, cosmo_dict, usecc=True):
+    def set_cosmology(self, cosmo_dict, usecc=False):
         self.cosmo_dict = cosmo_dict
         self.rhom = cosmo_dict['om']*rhocrit #Msun h^2/Mpc^3
         if usecc:
@@ -30,6 +30,7 @@ class tinkerMF(object):
             params = {
                 'output': 'mPk', #linear only
                 'h': cosmo_dict['h'],
+                #'A_s': cosmo_dict['As'],
                 'sigma8': cosmo_dict['s8'],
                 'n_s': cosmo_dict['ns'],
                 'w0_fld': cosmo_dict['w0'],
@@ -54,12 +55,10 @@ class tinkerMF(object):
                 #sigmas[i] = np.array([self.classcosmo.sigma(Ri, z[i]) for Ri in R])
                 h = self.cosmo_dict['h']
                 k = np.logspace(-5, 1, num=1000) #h Mpc^-1
-                p = np.array([self.classcosmo.pk_lin(ki, 1./a-1.) for ki in k])*h**3 #Mpc^3/h^3
+                p = np.array([self.classcosmo.pk_lin(ki, z[i]) for ki in k])*h**3 #Mpc^3/h^3
                 sigmas[i] = np.sqrt(bias.sigma2_at_M(M, k/h, p, self.cosmo_dict['om']))
             #self.sigma_spl = RBS(z, np.log(M), np.log(sigmas.T)) #If using interp2d
             self.sigma_spl = RBS(z, np.log(M), np.log(sigmas)) #If using RBS for real
-
-            
         self.usecc = usecc
         cos = self.cos_from_dict(cosmo_dict)
         self.t08_slopes_intercepts = self.t_08.predict_slopes_intercepts(cos)
@@ -72,11 +71,13 @@ class tinkerMF(object):
         ns = cd['ns']
         h  = cd['h']
         Neff = cd['Neff']
+        #As = cd['As']
         s8 = cd['s8']
         H0 = h*100
         Obh2 = ob*h*h
         Och2 = (om-ob)*h*h
         return np.array([Obh2, Och2, w0, ns, H0, Neff, s8])
+        #return np.array([Obh2, Och2, w0, ns, As, H0, Neff])
 
     def calc_normalization(self):
         #Calculates B, the normalization of the T08 MF.
@@ -150,8 +151,8 @@ class tinkerMF(object):
     def n_bins(self, Mbins, a):
         return np.array([self.n_bin(Mbi[0], Mbi[1], a) for Mbi in Mbins])
 
-def peak_height(M, a):
-    return 1.686/cc.sigmaMtophat(M, a)
+    def peak_height(self, M, a):
+        return 1.686/self.Mtosigma(M,a)
 
 if __name__ == "__main__":
     cos = {"om":0.3,"ob":0.05,"ol":1.-0.3,"ok":0.0,"h":0.7,"s8":0.77,"ns":0.96,"w0":-1.0,"wa":0.0,"Neff":3.0}
@@ -159,7 +160,7 @@ if __name__ == "__main__":
     M = np.logspace(12, 16, num=10)
 
     #import matplotlib.pyplot as plt
-    for i in xrange(0,4):
+    for i in xrange(0,1):
         a = 1./(1.+i)
         c = (1-a)/2
         n.set_cosmology(cos, usecc=True)
