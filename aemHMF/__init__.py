@@ -34,10 +34,7 @@ class Aemulus_HMF(object):
         self.tinkerMF.set_cosmology(cosmo_dict)
 
     def Mtosigma(self, M, z):
-        if type(M) is list or type(M) is np.ndarray:
-            return np.array([self.tinkerMF.Mtosigma(Mi, z) for Mi in M])
-        else:
-            return self.tinkerMF.Mtosigma(M, z)
+        return 1.686/self.tinkerMF.peak_height(M, z)
 
     def multiplicity(self, M, z):
         if type(M) is list or type(M) is np.ndarray:
@@ -46,16 +43,10 @@ class Aemulus_HMF(object):
             return self.tinkerMF.GM(M, z)
 
     def multiplicity_sigma(self, sigma, z):
-        if type(sigma) is list or type(sigma) is np.ndarray:
-            return np.array([self.tinkerMF.Gsigma(sigmai, z) for sigmai in sigma])
-        else:
-            return self.tinkerMF.Gsigma(sigma, z)
+        return self.tinkerMF.Gsigma(sigma, z)
 
     def dndlM(self, M, z):
-        if type(M) is list or type(M) is np.ndarray:
-            return np.array([self.tinkerMF.dndlM(Mi, z) for Mi in M])
-        else:        
-            return self.tinkerMF.dndlM(M, z)
+        return self.tinkerMF.dndlM(M, z)
 
     def n_bin(self, Mlow, Mhigh, z):
         return self.tinkerMF.n_bin(Mlow, Mhigh, z)
@@ -64,20 +55,20 @@ class Aemulus_HMF(object):
         return self.tinkerMF.n_bins(Mbins, z)
 
     def residual_realization(self, M, z, Nrealizations=1):
-        nu = np.array([self.tinkerMF.peak_height(Mi, z) for Mi in M])
+        nu = self.tinkerMF.peak_height(M, z)
         return np.array([self.residualgp.residual_realization(nu, np.ones_like(nu)*z) for i in range(Nrealizations)])
 
 if __name__ == "__main__":
     hmf = Aemulus_HMF()
     hmf.set_cosmology()
-    Medges = np.logspace(11, 16, num=11)
-    z = 0.02
+    Medges = np.logspace(12, 16, num=11)
+    z = 0
     Mbins = np.array([Medges[:-1], Medges[1:]]).T
     M = np.mean(Mbins, 1)
     n = hmf.n_bins(Mbins, z)
     fs = hmf.residual_realization(M, z, 50)
     print n
-
+    
     def wrapper():
         n = hmf.n_bins(Mbins, z)
     import timeit
