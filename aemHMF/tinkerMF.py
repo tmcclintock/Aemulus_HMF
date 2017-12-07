@@ -97,10 +97,10 @@ class tinkerMF(object):
         f = f0 + x*f1
         g = g0 + x*g1
         d, e, f, g = np.array([d,e,f,g]).flatten()
-        d=1.97 #for testing
-        e=1.0 #for testing
-        f=0.51 #for testing
-        g=1.228 #for testing
+        #d=1.97 #for testing
+        #e=1.0 #for testing
+        #f=0.51 #for testing
+        #g=1.228 #for testing
         return massfunction.dndM_at_M(M, k/h, p, Omega_m, d, e, f, g)*M
 
     def n_bin(self, Mlow, Mhigh, z):

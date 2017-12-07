@@ -45,7 +45,7 @@ if __name__ == "__main__":
     if use_nu: x = nus
     else: x = lMs
     
-    fgp = aemHMF.Aemulus_HMF().f
+    fgp = aemHMF.Aemulus_HMF().residualgp
     nugp = np.linspace(min(x)-.1, max(x)+.1, 100)
     fig, axarr = plt.subplots(1,2, sharey=True)
     #First do the points
@@ -57,11 +57,11 @@ if __name__ == "__main__":
         #print np.log10(get_masses(nus[inds], z[i]))
         axarr[ax].plot(x[inds], R[inds], marker='.', ls='', markersize=1, c=colors[i], label=r"$z=%.2f$"%z[i], alpha=0.4)
         zgp = z[i]*np.ones_like(nugp)
-        mu, cov = fgp.predict_f(nugp, zgp)
+        mu, cov = fgp.predict_residual(nugp, zgp)
         errgp = np.sqrt(np.diag(cov))
         #axarr[ax].fill_between(nugp, -errgp, errgp, color=colors[i], alpha=0.1,zorder=-(i-10))
         for j in range(10):
-            axarr[ax].plot(nugp, fgp.sample_f(nugp, zgp), c=colors[i], ls='-', zorder=-(i-10), alpha=0.2)
+            axarr[ax].plot(nugp, fgp.residual_realization(nugp, zgp), c=colors[i], ls='-', zorder=-(i-10), alpha=0.2)
 
         axarr[ax].axhline(0, ls='-', c='k', lw=1)
         #axarr[ax].fill_between([min(nugp), max(nugp)], -0.01, 0.01, color='gray', alpha=0.2)
