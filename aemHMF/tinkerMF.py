@@ -59,7 +59,7 @@ class tinkerMF(object):
         out = np.array([Obh2, Och2, w0, ns, l10As, H0, Neff])
         return out
 
-    def get_tinker_parameters(self):
+    def get_tinker_parameters(self, z):
         d0,d1,e0,e1,f0,f1,g0,g1 = self.t08_slopes_intercepts
         x = (1.+z)-0.5
         d = d0 + x*d1
@@ -68,17 +68,16 @@ class tinkerMF(object):
         g = g0 + x*g1
         return  np.array([d,e,f,g]).flatten()
 
-
     def GM(self, M, z):
         h = self.cosmo_dict['H0']/100.
         Omega_m = (self.cosmo_dict['Obh2']+self.cosmo_dict['Och2'])/h**2
         k = self.k_array #Mpc^-1
         p = np.array([self.classcosmo.pk_lin(ki, z) for ki in k])*h**3 #[Mpc/h]^3
-        d, e, f, g = self.get_tinker_parameters()
+        d, e, f, g = self.get_tinker_parameters(z)
         return massfunction.G_at_M(M, k/h, p, Omega_m, d, e, f, g)
 
     def Gsigma(self, sigma, z):
-        d, e, f, g = self.get_tinker_parameters()
+        d, e, f, g = self.get_tinker_parameters(z)
         return massfunction.G_at_sigma(sigma, d, e, f, g)
         
     def dndlM(self, M, z):
@@ -86,7 +85,7 @@ class tinkerMF(object):
         Omega_m = (self.cosmo_dict['Obh2']+self.cosmo_dict['Och2'])/h**2
         k = self.k_array #Mpc^-1
         p = np.array([self.classcosmo.pk_lin(ki, z) for ki in k])*h**3 #[Mpc/h]^3
-        d, e, f, g = self.get_tinker_parameters()
+        d, e, f, g = self.get_tinker_parameters(z)
         return massfunction.dndM_at_M(M, k/h, p, Omega_m, d, e, f, g)*M
 
     def n_bin(self, Mlow, Mhigh, z):

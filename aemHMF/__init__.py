@@ -9,10 +9,10 @@ import numpy as np
 class Aemulus_HMF(object):
 
     #This is the format the cosmological dictionary should take.
-    default_cosmology = {"Omega_m":0.3,
-                         "Omega_b":0.05,
-                         "h":0.7,
-                         "sigma8":0.77,
+    default_cosmology = {"Och2":0.1225,
+                         "Obh2":0.0245,
+                         "H0":70., #km/sec/Mpc
+                         "ln10^{10}A_s":3.093,
                          "n_s":0.96,
                          "w0":-1.0,
                          "N_eff":3.0,
