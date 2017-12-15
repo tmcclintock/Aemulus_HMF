@@ -8,7 +8,9 @@ plt.rc("text", usetex=True)
 if __name__ == "__main__":
     Volume = 1050.**3 #Mpc^3/h^3
     box = 0
-    Ombh2, Omch2, w, ns, ln10As, H0, Neff, sig8 = np.genfromtxt(AD.path_to_building_box_cosmologies())[box]
+    
+    Ombh2, Omch2, w, ns, ln10As, H0, Neff, sig8 = AD.get_building_box_cosmologies()[box]
+    #np.genfromtxt(AD.path_to_building_box_cosmologies())[box]
     h = H0/100.
     Ob = Ombh2/h**2
     Oc = Omch2/h**2
@@ -27,15 +29,13 @@ if __name__ == "__main__":
         if snapshot < 2: continue
         a = sfs[snapshot]
         z = zs[snapshot]
-        path = AD.path_to_building_box_data(box, snapshot)
-        lMlo, lMhi, N, Mtot = np.genfromtxt(path, unpack=True)
+        lMlo, lMhi, N, Mtot = AD.get_building_box_binned_mass_function(box, snapshot).T
         M_bins = 10**np.array([lMlo, lMhi]).T
         M = Mtot/N
-        covpath = AD.path_to_building_box_covariance(box, snapshot)
-        cov = np.loadtxt(covpath)
+        cov = AD.get_building_box_binned_mass_function_covariance(box, snapshot)
         err = np.sqrt(np.diag(cov))
 
-        N_aem = hmf.n_bins(M_bins, a, with_f=False)*Volume
+        N_aem = hmf.n_bins(M_bins, a)*Volume
         pdiff = (N-N_aem)/N_aem
         pdiff_err = err/N_aem
 

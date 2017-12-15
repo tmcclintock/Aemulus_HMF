@@ -21,45 +21,10 @@ class tinkerMF(object):
     def __init__(self):
         self.t_08 = emu.emu()
 
-    def set_cosmology(self, cosmo_dict, usecc=False):
+    def set_cosmology(self, cosmo_dict):
         self.cosmo_dict = cosmo_dict
         self.rhom = cosmo_dict['om']*rhocrit #Msun h^2/Mpc^3
-        if usecc:
-            cc.set_cosmology(cosmo_dict)
-        else:
-            params = {
-                'output': 'mPk', #linear only
-                'h': cosmo_dict['h'],
-                #'A_s': cosmo_dict['As'],
-                'sigma8': cosmo_dict['s8'],
-                'n_s': cosmo_dict['ns'],
-                'w0_fld': cosmo_dict['w0'],
-                'wa_fld': 0.0,
-                'Omega_b': cosmo_dict['ob'],
-                'Omega_cdm': cosmo_dict['om'] - cosmo_dict['ob'],
-                'Omega_Lambda': 1.- cosmo_dict['om'],
-                'N_eff':cosmo_dict['Neff'],
-                'P_k_max_1/Mpc':10.,
-                'z_max_pk':10.
-            }
-            self.classcosmo = Class()
-            self.classcosmo.set(params)
-            self.classcosmo.compute()
-            Nm = 100
-            Nz = 10
-            M = np.logspace(11, 17, num=Nm) #Msun/h
-            R = self.MtoR(M) #Mpc already
-            z = np.linspace(0, 3, num=Nz)
-            sigmas = np.zeros((Nz, Nm))
-            for i in range(Nz):
-                #sigmas[i] = np.array([self.classcosmo.sigma(Ri, z[i]) for Ri in R])
-                h = self.cosmo_dict['h']
-                k = np.logspace(-5, 1, num=1000) #h Mpc^-1
-                p = np.array([self.classcosmo.pk_lin(ki, z[i]) for ki in k])*h**3 #Mpc^3/h^3
-                sigmas[i] = np.sqrt(bias.sigma2_at_M(M, k/h, p, self.cosmo_dict['om']))
-            #self.sigma_spl = RBS(z, np.log(M), np.log(sigmas.T)) #If using interp2d
-            self.sigma_spl = RBS(z, np.log(M), np.log(sigmas)) #If using RBS for real
-        self.usecc = usecc
+        cc.set_cosmology(cosmo_dict)
         cos = self.cos_from_dict(cosmo_dict)
         self.t08_slopes_intercepts = self.t_08.predict_slopes_intercepts(cos)
         
@@ -71,13 +36,11 @@ class tinkerMF(object):
         ns = cd['ns']
         h  = cd['h']
         Neff = cd['Neff']
-        #As = cd['As']
         s8 = cd['s8']
         H0 = h*100
         Obh2 = ob*h*h
         Och2 = (om-ob)*h*h
         return np.array([Obh2, Och2, w0, ns, H0, Neff, s8])
-        #return np.array([Obh2, Och2, w0, ns, As, H0, Neff])
 
     def calc_normalization(self):
         #Calculates B, the normalization of the T08 MF.
@@ -97,7 +60,6 @@ class tinkerMF(object):
         e = np.array([1.0]) #Default Tinker08 value
         f = f0 + k*f1
         g = g0 + k*g1
-        #print "in merge",a, d ,e, f, g
         self.t08_params = np.array([d, e, f, g]).flatten()
         return
 
@@ -105,11 +67,7 @@ class tinkerMF(object):
         return (M/(4./3.*np.pi*self.rhom))**(1./3.)/self.cosmo_dict['h'] #Lagrangian radius in Mpc
 
     def Mtosigma(self, M, a):
-        if self.usecc:
             return cc.sigmaMtophat(M, a)
-        else:
-            #return np.exp(self.sigma_spl(1./a-1, np.log(M))[0]) #If using interp2d
-            return np.exp(self.sigma_spl(1./a-1, np.log(M))[0][0]) #If using RBS for real
         
     def Gsigma(self, sigma, a):
         if not hasattr(self, "a"):
@@ -159,25 +117,8 @@ if __name__ == "__main__":
     n = tinkerMF()
     M = np.logspace(12, 16, num=10)
 
-    #import matplotlib.pyplot as plt
     for i in xrange(0,1):
         a = 1./(1.+i)
         c = (1-a)/2
-        n.set_cosmology(cos, usecc=True)
+        n.set_cosmology(cos)
         dndlMcc = np.array([n.dndlM(Mi, a) for Mi in M])
-        #print dndlMcc
-        n.set_cosmology(cos, usecc=False)
-        dndlMcl = np.array([n.dndlM(Mi, a) for Mi in M])
-        #print dndlMcl
-        dif = (dndlMcl-dndlMcc)/dndlMcl
-        #print dif
-        #plt.plot(M, dif, label="z=%d"%i)
-        #plt.loglog(M, dndlMcc, label="z=%d"%i)
-        #plt.loglog(M, dndlMcl, label="z=%d"%i, ls=':')
-        for Mi, d in zip(M, dif):
-            print Mi, d
-    #plt.legend(loc=0)
-    #plt.xscale('log')
-    #plt.xlabel("Mass")
-    #plt.ylabel("$(n_{class}-n_{cc})/n_{class})$")
-    #plt.show()
