@@ -6,6 +6,7 @@ import george
 import os, inspect
 import numpy as np
 import scipy.optimize as op
+import Aemulus_data as AD
 data_path = os.path.dirname(os.path.abspath(inspect.stack()[0][1]))+"/data_files/"
 #data_path = "../../fit_mass_functions/output/dfg_rotated/"
 R_matrix_path = data_path+"R2.txt"#+"R_matrix.txt"
