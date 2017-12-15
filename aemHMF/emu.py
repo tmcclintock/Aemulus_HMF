@@ -8,11 +8,11 @@ import numpy as np
 import scipy.optimize as op
 import aemulus_data as AD
 data_path = os.path.dirname(os.path.abspath(inspect.stack()[0][1]))+"/data_files/"
-R_matrix_path = data_path+"R2.txt"
+R_matrix_path = data_path+"R.txt"
 means_path    = data_path+"r_defg_means.txt"
 vars_path     = data_path+"r_defg_vars.txt"
 cosmos = AD.get_building_box_cosmologies()
-cosmos = cosmos[0:36] #Temporary
+cosmos = cosmos[0:37] #Temporary
 cosmos = np.delete(cosmos, -1, 1) #Delete sigma8
 
 N_cosmos = len(cosmos)
