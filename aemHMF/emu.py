@@ -8,17 +8,25 @@ import numpy as np
 import scipy.optimize as op
 data_path = os.path.dirname(os.path.abspath(inspect.stack()[0][1]))+"/data_files/"
 #data_path = "../../fit_mass_functions/output/dfg_rotated/"
-R_matrix_path = data_path+"R_matrix.txt"
-means_path    = data_path+"rotated_dfg_means.txt"
-vars_path     = data_path+"rotated_dfg_vars.txt"
+R_matrix_path = data_path+"R2.txt"#+"R_matrix.txt"
+means_path    = data_path+"r_defg_means.txt"#"rotated_dfg_means.txt"
+vars_path     = data_path+"r_defg_vars.txt"#"rotated_dfg_vars.txt"
 cosmos_path   = data_path+"cosmos.txt"
 cosmos = np.genfromtxt(cosmos_path)
 cosmos = np.delete(cosmos, 0, 1)  #boxnum
 cosmos = np.delete(cosmos, 4, 1)  #ln10As
 #cosmos = np.delete(cosmos, 7, 1)  #sigma8
+cosmos = cosmos[:36] # FOR NOW
 N_cosmos = len(cosmos)
 N_params = len(cosmos[0])
 
+means  = np.genfromtxt(means_path)
+var   = np.genfromtxt(vars_path)
+print "Truth:"
+for m,v in zip(means[0], var[0]):
+    print m, np.sqrt(v)
+print cosmos[0]
+    
 class emu(object):
 
     def __init__(self):
@@ -58,6 +66,8 @@ class emu(object):
         x = np.atleast_2d(cosmo)
         y = self.means.T
         params = np.array([gp.predict(yi, x)[0] for yi,gp in zip(y, self.gplist)])
+        print "Actual:",params
+
         return np.dot(self.R, params).flatten()
 
 if __name__ == "__main__":

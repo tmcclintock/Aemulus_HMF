@@ -58,7 +58,9 @@ class tinkerMF(object):
         H0 = h*100
         Obh2 = ob*h*h
         Och2 = (om-ob)*h*h
-        return np.array([Obh2, Och2, w0, ns, H0, Neff, s8])
+        out = np.array([Obh2, Och2, w0, ns, H0, Neff, s8])
+        print out
+        return out
         #return np.array([Obh2, Och2, w0, ns, As, H0, Neff])
 
     def GM(self, M, z):
@@ -66,20 +68,21 @@ class tinkerMF(object):
         Omega_m = self.cosmo_dict['Omega_m']
         k = self.k_array #Mpc^-1
         p = np.array([self.classcosmo.pk_lin(ki, z) for ki in k])*h**3 #[Mpc/h]^3
-        d0,d1,f0,f1,g0,g1 = self.t08_slopes_intercepts
+        d0,d1,e0,e1,f0,f1,g0,g1 = self.t08_slopes_intercepts
         x = (1.+z)-0.5
         d = d0 + x*d1
-        e = 1.0 #Default value
+        e = e0 + x*e1
         f = f0 + x*f1
         g = g0 + x*g1
         d, e, f, g = np.array([d,e,f,g]).flatten()
         return massfunction.G_at_M(M, k/h, p, Omega_m, d, e, f, g)
 
     def Gsigma(self, sigma, z):
-        d0,d1,f0,f1,g0,g1 = self.t08_slopes_intercepts
+        d0,d1,e0,e1,f0,f1,g0,g1 = self.t08_slopes_intercepts
+        #d0,d1,f0,f1,g0,g1 = self.t08_slopes_intercepts
         x = (1.+z)-0.5
         d = d0 + x*d1
-        e = 1.0 #Default value
+        e = e0 + x*e1
         f = f0 + x*f1
         g = g0 + x*g1
         d, e, f, g = np.array([d,e,f,g]).flatten()
@@ -91,9 +94,9 @@ class tinkerMF(object):
         k = self.k_array #Mpc^-1
         p = np.array([self.classcosmo.pk_lin(ki, z) for ki in k])*h**3 #[Mpc/h]^3
         x = 1./(1.+z)-0.5
-        d0,d1,f0,f1,g0,g1 = self.t08_slopes_intercepts
+        d0,d1,e0,e1,f0,f1,g0,g1 = self.t08_slopes_intercepts
         d = d0 + x*d1
-        e = 1.0 #Default value
+        e = e0 + x*e1
         f = f0 + x*f1
         g = g0 + x*g1
         d, e, f, g = np.array([d,e,f,g]).flatten()
@@ -130,12 +133,10 @@ if __name__ == "__main__":
     n.set_cosmology(cos)
     M = np.logspace(12, 16, num=20)
     Mbins = np.array([M[:-1], M[1:]]).T
-    print n.n_bins(Mbins, 0)*1e9 #1 Gpc cube
     import matplotlib.pyplot as plt
     for i in xrange(0,1):
         z = float(i)
         dndlM = n.dndlM(M, z)
-        print dndlM
         plt.loglog(M, dndlM, label="z=%d"%i, ls='-')
     plt.legend(loc=0)
     plt.xlabel("Mass")
