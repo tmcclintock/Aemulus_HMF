@@ -4,6 +4,12 @@ import matplotlib.pyplot as plt
 import aemulus_data as AD
 plt.rc("text", usetex=True)
 
+#Rotated truth
+rtruth = np.array([-2.339125542802287516e-01,1.677880868088988064e+00,-2.970725392927930919e-01,-1.811569826499570546e+00,-8.172432603742930679e-01,4.115225664991982168e-01,5.014313130135825691e-01,6.339511118396800038e-01])
+
+#Truths seem to not be working...
+truth = np.array([2.129564190209325858e+00,2.723050117494064670e-01,1.030583349035203877e+00,2.615788704277006715e-01,4.399726014100137084e-01,1.116731634545981983e-01,1.302959111993434504e+00,2.951828692688652223e-01])
+
 
 if __name__ == "__main__":
     Volume = 1050.**3 #Mpc^3/h^3
@@ -13,6 +19,8 @@ if __name__ == "__main__":
 
     hmf = aemHMF.Aemulus_HMF()
     hmf.set_cosmology(cosmo)
+    print hmf.tinkerMF.t08_slopes_intercepts
+    hmf.tinkerMF.t08_slopes_intercepts = truth
     
     f, axarr = plt.subplots(2, sharex=True)
     sfs = AD.get_scale_factors()
