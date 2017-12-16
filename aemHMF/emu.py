@@ -12,7 +12,6 @@ R_matrix_path = data_path+"R.txt"
 means_path    = data_path+"r_defg_means.txt"
 vars_path     = data_path+"r_defg_vars.txt"
 cosmos = AD.get_building_box_cosmologies()
-cosmos = cosmos[0:37] #Temporary
 cosmos = np.delete(cosmos, -1, 1) #Delete sigma8
 
 N_cosmos = len(cosmos)

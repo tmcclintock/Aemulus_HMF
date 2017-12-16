@@ -19,7 +19,7 @@ if __name__ == "__main__":
     zs = 1./sfs - 1
     colors = [plt.get_cmap("seismic")(ci) for ci in np.linspace(1.0, 0.0, len(sfs))]
     for snapshot in range(len(sfs)):
-        if snapshot < 9: continue
+        if snapshot < 0: continue
         z = zs[snapshot]
         lMlo, lMhi, N, Mtot = AD.get_building_box_binned_mass_function(box, snapshot).T
         M_bins = 10**np.array([lMlo, lMhi]).T
