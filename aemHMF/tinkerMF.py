@@ -61,7 +61,7 @@ class tinkerMF(object):
 
     def get_tinker_parameters(self, z):
         d0,d1,e0,e1,f0,f1,g0,g1 = self.t08_slopes_intercepts
-        x = (1.+z)-0.5
+        x = 1./(1.+z)-0.5
         d = d0 + x*d1
         e = e0 + x*e1
         f = f0 + x*f1
