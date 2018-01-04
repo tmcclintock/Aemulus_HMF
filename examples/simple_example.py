@@ -7,13 +7,13 @@ import aemulus_data as AD
 if __name__ == "__main__":
 
     z = 0.0
-    box, snap = 0, 9
-    lMlo, lMhi, N, Mtot = AD.get_building_box_binned_mass_function(box, snap).T
+    box, snap = 36, 9
+    lMlo, lMhi, N, Mtot = AD.building_box_binned_mass_function(box, snap).T
     M_bins = 10**np.array([lMlo, lMhi]).T
     M = Mtot/N
     Volume = 1050.**3 #Mpc^3/h^3
 
-    Obh2, Och2, w, ns, ln10As, H0, Neff, sig8 = AD.get_building_box_cosmologies()[box]
+    Obh2, Och2, w, ns, ln10As, H0, Neff, sig8 = AD.building_box_cosmologies()[box]
     cosmo = {"Obh2":Obh2, "Och2":Och2, "H0":H0, "ln10^{10}A_s":ln10As, "n_s":ns, "w0":w, "N_eff":Neff}
 
     hmf = aemHMF.Aemulus_HMF()

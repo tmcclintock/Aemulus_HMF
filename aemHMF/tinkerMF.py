@@ -46,6 +46,7 @@ class tinkerMF(object):
         self.k_array = np.logspace(-5, 1, num=1000) #Mpc^-1
         cos = self.cos_from_dict(cosmo_dict)
         self.t08_slopes_intercepts = self.params_emu.predict_slopes_intercepts(cos)
+        print self.t08_slopes_intercepts
         
     def cos_from_dict(self, cosmo_dict):
         cd = cosmo_dict
