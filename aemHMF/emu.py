@@ -8,9 +8,10 @@ import numpy as np
 import scipy.optimize as op
 import aemulus_data as AD
 data_path = os.path.dirname(os.path.abspath(inspect.stack()[0][1]))+"/data_files/"
-R_matrix_path = data_path+"R.txt"
-means_path    = data_path+"r_defg_means.txt"
-vars_path     = data_path+"r_defg_vars.txt"
+model = "dfg"
+R_matrix_path = data_path+"R_%s.txt"%model
+means_path    = data_path+"r_%s_means.txt"%model
+vars_path     = data_path+"r_%s_vars.txt"%model
 cosmos = AD.building_box_cosmologies()
 cosmos = np.delete(cosmos, -1, 1) #Delete sigma8
 
@@ -62,6 +63,7 @@ class emu(object):
 
     def predict_slopes_intercepts(self, cosmo):
         params = self.predict_rotated_params(cosmo)
+        #return params.flatten()
         return np.dot(self.R, params).flatten()
 
 if __name__ == "__main__":

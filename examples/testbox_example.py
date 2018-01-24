@@ -9,33 +9,26 @@ plt.rc('font', family='serif')
 if __name__ == "__main__":
     Volume = 1050.**3 #Mpc^3/h^3
     box = 0
-    Ombh2, Omch2, w, ns, ln10As, H0, Neff, sig8 = np.genfromtxt(AD.path_to_test_box_cosmologies())[box]
-    h = H0/100.
-    Ob = Ombh2/h**2
-    Oc = Omch2/h**2
-    Om = Ob + Oc
-    
-    cosmo = {"om":Om, "ob":Ob, "ol":1-Om, "h":h, "s8":sig8, "ns":ns, "w0":w, "Neff":Neff}
-    print cosmo
+    Ombh2, Omch2, w, ns, ln10As, H0, Neff, sig8 = AD.test_box_cosmologies()[box]
+
+    cosmo={'Obh2':Ombh2, 'Och2':Omch2, 'w0':w, 'n_s':ns, 'ln10^{10}A_s':ln10As, 'N_eff':Neff, 'H0':H0}
+
     hmf = aemHMF.Aemulus_HMF()
     hmf.set_cosmology(cosmo)
     
     f, axarr = plt.subplots(2, sharex=True)
-    sfs = AD.get_scale_factors()
+    sfs = AD.scale_factors()
     zs = 1./sfs - 1
     colors = [plt.get_cmap("seismic")(ci) for ci in np.linspace(1.0, 0.0, len(sfs))]
     for snapshot in range(len(sfs)):
-        if snapshot < 9: continue
-        a = sfs[snapshot]
         z = zs[snapshot]
-        print a, Volume
-        lMlo, lMhi, N, Mtot = AD.get_test_box_binned_mass_function(box, snapshot).T
+        lMlo, lMhi, N, Mtot = AD.test_box_binned_mass_function(box, snapshot).T
         M_bins = 10**np.array([lMlo, lMhi]).T
         M = Mtot/N
-        cov = AD.get_test_box_binned_mass_function_covariance(box, snapshot)
-        err = np.sqrt(np.diag(cov))
+        cov = AD.test_box_binned_mass_function_covariance(box, snapshot)
+        err = np.sqrt(cov.diagonal())
 
-        N_aem = hmf.n_bins(M_bins, a)*Volume
+        N_aem = hmf.n_bins(M_bins, z)*Volume
         pdiff = (N-N_aem)/N_aem
         pdiff_err = err/N_aem
 
