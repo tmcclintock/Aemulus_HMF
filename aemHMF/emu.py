@@ -32,7 +32,7 @@ class emu(object):
 
     def train(self):
         cosmos = self.cosmos
-        lguess = (np.max(cosmos, 0) - np.min(cosmos, 0))/N_cosmos
+        lguess = np.std(cosmos,0)
         means, errs = self.means, np.sqrt(self.vars)
         N_emus = len(means[0])
         gplist = []
