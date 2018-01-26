@@ -8,7 +8,7 @@ plt.rc('font', family='serif')
 
 if __name__ == "__main__":
     Volume = 1050.**3 #Mpc^3/h^3
-    box = 0
+    box = 4
     Ombh2, Omch2, w, ns, ln10As, H0, Neff, sig8 = AD.test_box_cosmologies()[box]
 
     cosmo={'Obh2':Ombh2, 'Och2':Omch2, 'w0':w, 'n_s':ns, 'ln10^{10}A_s':ln10As, 'N_eff':Neff, 'H0':H0}
@@ -24,13 +24,22 @@ if __name__ == "__main__":
         z = zs[snapshot]
         lMlo, lMhi, N, Mtot = AD.test_box_binned_mass_function(box, snapshot).T
         M_bins = 10**np.array([lMlo, lMhi]).T
+        inds = (N>0)
+        Mtot = Mtot[inds]
+        N = N[inds]
         M = Mtot/N
+        M_bins = M_bins[inds]
         cov = AD.test_box_binned_mass_function_covariance(box, snapshot)
+        cov = cov[inds]
+        cov = cov[:,inds]
+        icov = np.linalg.inv(cov)
         err = np.sqrt(cov.diagonal())
-
+        
         N_aem = hmf.n_bins(M_bins, z)*Volume
         pdiff = (N-N_aem)/N_aem
         pdiff_err = err/N_aem
+        chi2 = np.dot(N-N_aem, np.dot(icov, N-N_aem))
+        print "b%d s%d %.2f"%(box, snapshot, chi2)
 
         if snapshot in [0, 2, 5, 9]:
             axarr[0].errorbar(M, N, err, ls='', marker='.', c=colors[snapshot], label=r"$z=%.2f$"%z)

@@ -67,6 +67,14 @@ class tinkerMF(object):
         elif len(params) == 6:
             d0,d1,f0,f1,g0,g1 = params
             e0,e1 = 1.0, 0.0
+        elif len(params) == 7:
+            name = self.params_emu.name
+            if 'e0' in name:
+                d0,d1,e0,f0,f1,g0,g1 = params
+                e1 = 0.3098
+            elif 'e1' in name:
+                d0,d1,e1,f0,f1,g0,g1 = params
+                e0 = 1.11
         x = 1./(1.+z)-0.5
         d = d0 + x*d1
         e = e0 + x*e1

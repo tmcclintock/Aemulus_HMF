@@ -8,7 +8,7 @@ import numpy as np
 import scipy.optimize as op
 import aemulus_data as AD
 data_path = os.path.dirname(os.path.abspath(inspect.stack()[0][1]))+"/data_files/"
-model = "dfg"
+model = "de1fg"
 R_matrix_path = data_path+"R_%s.txt"%model
 means_path    = data_path+"r_%s_means.txt"%model
 vars_path     = data_path+"r_%s_vars.txt"%model
@@ -29,6 +29,7 @@ class emu(object):
         self.vars   = np.genfromtxt(vars_path)
         self.cosmos = cosmos
         self.train()
+        self.name=model
 
     def train(self):
         cosmos = self.cosmos
@@ -38,7 +39,7 @@ class emu(object):
         gplist = []
         for i in range(N_emus):
             y, yerr = means[:, i], errs[:, i]
-            kernel = george.kernels.ExpSquaredKernel(lguess, ndim=N_params)
+            kernel = 1.0*george.kernels.ExpSquaredKernel(lguess, ndim=N_params)
             gp = george.GP(kernel, mean=np.mean(y), fit_mean=True,
                            white_noise=np.log(np.mean(yerr)**2), fit_white_noise=True)
             gp.compute(cosmos, yerr)
