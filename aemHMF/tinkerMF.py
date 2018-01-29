@@ -57,7 +57,9 @@ class tinkerMF(object):
         H0  = cd['H0']
         Neff = cd['N_eff']
         l10As = cd['ln10^{10}A_s']
+        #sigma8 = cd['sigma8']
         out = np.array([Obh2, Och2, w0, ns, l10As, H0, Neff])
+        #out = np.array([Obh2, Och2, w0, ns, H0, Neff, sigma8])
         return out
 
     def get_tinker_parameters(self, z):

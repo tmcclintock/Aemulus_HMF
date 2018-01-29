@@ -3,13 +3,14 @@ This contains the code necessary to predict the Tinker08 MF parameters.
 It does not contain the code for the mass function itself.
 """
 import george
+from george.kernels import *
 import os, inspect
 import numpy as np
 import scipy.optimize as op
 import aemulus_data as AD
 data_path = os.path.dirname(os.path.abspath(inspect.stack()[0][1]))+"/data_files/"
 #model = "special"
-model = "defg"
+model = "dfg"
 R_matrix_path = data_path+"R_%s.txt"%model
 means_path    = data_path+"r_%s_means.txt"%model
 vars_path     = data_path+"r_%s_vars.txt"%model
@@ -25,9 +26,9 @@ var   = np.genfromtxt(vars_path)
 class emu(object):
 
     def __init__(self):
-        self.R      = np.genfromtxt(R_matrix_path)
-        self.means  = np.genfromtxt(means_path)
-        self.vars   = np.genfromtxt(vars_path)
+        self.R      = np.loadtxt(R_matrix_path)
+        self.means  = np.loadtxt(means_path)
+        self.vars   = np.loadtxt(vars_path)
         self.cosmos = cosmos
         self.train()
         self.name=model
@@ -40,7 +41,7 @@ class emu(object):
         gplist = []
         for i in range(N_emus):
             y, yerr = means[:, i], errs[:, i]
-            kernel = 1.0*george.kernels.ExpSquaredKernel(lguess, ndim=N_params)
+            kernel = 1.0*ExpSquaredKernel(lguess, ndim=N_params)
             gp = george.GP(kernel, mean=np.mean(y), fit_mean=True,
                            white_noise=np.log(np.mean(yerr)**2), fit_white_noise=True)
             gp.compute(cosmos, yerr)
