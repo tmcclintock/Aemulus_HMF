@@ -21,23 +21,33 @@ if __name__ == "__main__":
     hmf.set_cosmology(cosmo)
     
     f, axarr = plt.subplots(2, sharex=True)
-    sfs = AD.get_scale_factors()
+    sfs = AD.scale_factors()
     zs = 1./sfs - 1
     colors = [plt.get_cmap("seismic")(ci) for ci in np.linspace(1.0, 0.0, len(sfs))]
     for snapshot in range(len(sfs)):
-        if snapshot < 9: continue
+        #if snapshot < 9: continue
         a = sfs[snapshot]
         z = zs[snapshot]
-        print a, Volume
-        lMlo, lMhi, N, Mtot = AD.get_test_box_binned_mass_function(box, snapshot).T
+        #print a, Volume
+        lMlo, lMhi, N, Mtot = AD.test_box_binned_mass_function(box, snapshot).T
         M_bins = 10**np.array([lMlo, lMhi]).T
+        good = (N>0)
+        N = N[good]
+        Mtot = Mtot[good]
+        M_bins = M_bins[good]
         M = Mtot/N
-        cov = AD.get_test_box_binned_mass_function_covariance(box, snapshot)
+        cov = AD.test_box_binned_mass_function_covariance(box, snapshot)
+        cov = cov[good]
+        cov = cov[:,good]
+        icov = np.linalg.inv(cov)
         err = np.sqrt(np.diag(cov))
-
+        
         N_aem = hmf.n_bins(M_bins, a)*Volume
         pdiff = (N-N_aem)/N_aem
         pdiff_err = err/N_aem
+
+        chi2 = np.dot(N-N_aem, np.dot(icov, N-N_aem))
+        print "b%d s%d chi2=%.2f"%(box, snapshot, chi2)
 
         if snapshot in [0, 2, 5, 9]:
             axarr[0].errorbar(M, N, err, ls='', marker='.', c=colors[snapshot], label=r"$z=%.2f$"%z)
