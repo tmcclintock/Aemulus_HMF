@@ -19,6 +19,7 @@ if __name__ == "__main__":
     
     hmf = aemHMF.Aemulus_HMF()
     hmf.set_cosmology(cosmo)
+    print hmf.tinkerMF.params_emu.name
     #hmf.n_t08.t08_slopes_intercepts = np.dot(Rmatrix, bfparams).flatten()
     
     f, axarr = plt.subplots(2, sharex=True)

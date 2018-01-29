@@ -9,43 +9,46 @@ import numpy as np
 import aemulus_data as AD
 import matplotlib.pyplot as plt
 
-scale_factors = AD.get_scale_factors()
+scale_factors = AD.scale_factors()
 zs = 1./scale_factors - 1.
 Volume = 1050.**3 #Mpc/h ^3
 
+model = "defg"
 with_f = False
-Rmatrix = np.loadtxt("../aemHMF/data_files/R_matrix.txt")
+#Rmatrix = np.loadtxt("../aemHMF/data_files/R_matrix.txt")
 
 def get_residuals(box, snapshot, hmf, building_boxes=True, bf=False):
     if building_boxes:
-        path = AD.path_to_building_box_data(box, snapshot)
-        covpath = AD.path_to_building_box_covariance(box, snapshot)
+        get_data = AD.building_box_binned_mass_function
+        get_cov = AD.building_box_binned_mass_function_covariance
     else:
-        path = AD.path_to_test_box_data(box, snapshot)
-        covpath = AD.path_to_test_box_covariance(box, snapshot)
+        get_data = AD.test_box_binned_mass_function
+        get_cov = AD.test_box_binned_mass_function_covariance
     a = scale_factors[snapshot]
-    lMlo, lMhi, N, Mtot = np.genfromtxt(path, unpack=True)
+    z = zs[snapshot]
+    lMlo, lMhi, N, Mtot = get_data(box, snapshot)
+    cov = get_cov(box, snapshot)
     good = N > 0
     lMlo = lMlo[good]
     lMhi = lMhi[good]
     N = N[good]
     Mtot = Mtot[good]
+    cov = cov[good]
+    cov = cov[:,good]
+    icov = np.linalg.inv(cov)
+    err = np.sqrt(np.diag(cov))
     M = Mtot/N
     Mbins = 10**np.array([lMlo, lMhi]).T
 
-    cov = np.loadtxt(covpath)
-    err = np.sqrt(np.diag(cov))
-    err = err[good]
-
     if bf:
-        bfparams = np.loadtxt("../aemHMF/data_files/rotated_dfg_means.txt")[box]
-        hmf.n_t08.t08_slopes_intercepts = np.dot(Rmatrix, bfparams).flatten()
-        hmf.n_t08.merge_t08_params(a)
+        bfparams = np.loadtxt("../aemHMF/data_files/r_%s_means.txt"%model)[box]
+        hmf.tinkerMF.t08_slopes_intercepts = np.dot(Rmatrix, bfparams).flatten()
+        hmf.tinkerMF.merge_t08_params(a)
     
-    nt08 = hmf.n_bins(Mbins, a, with_f=with_f)
-    Nt08 = nt08*Volume
-    Residual = (N-Nt08)/Nt08
-    Residerr = err/Nt08
+    n_aem = hmf.n_bins(Mbins, z)
+    N_aem = nt08*Volume
+    Residual = (N-N_aem)/N_aem
+    Residerr = err/N_aem
 
     #Make arrays of everything that we want to return
     z = np.ones_like(N)*zs[snapshot]
