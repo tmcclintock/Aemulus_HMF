@@ -11,7 +11,7 @@ bfparams_all = np.loadtxt("../aemHMF/data_files/r_dfg_means.txt")
 
 if __name__ == "__main__":
     Volume = 1050.**3 #Mpc^3/h^3
-    box = 3
+    box = 26
     Ombh2, Omch2, w, ns, ln10As, H0, Neff, sig8 = AD.building_box_cosmologies()[box]
     cosmo={'Obh2':Ombh2, 'Och2':Omch2, 'w0':w, 'n_s':ns, 'ln10^{10}A_s':ln10As, 'N_eff':Neff, 'H0':H0}
     
@@ -65,5 +65,5 @@ if __name__ == "__main__":
     axarr[1].fill_between(xlim, -0.01, 0.01, color="gray", alpha=0.2)
     axarr[1].set_xlim(xlim)
     plt.subplots_adjust(hspace=0, wspace=0, left=0.20, bottom=0.15)
-    plt.gcf().savefig("bestfit_final.pdf")
+    #plt.gcf().savefig("bestfit_final.pdf")
     plt.show()

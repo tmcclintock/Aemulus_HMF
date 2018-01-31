@@ -8,7 +8,7 @@ plt.rc('font', family='serif')
 
 if __name__ == "__main__":
     Volume = 1050.**3 #Mpc^3/h^3
-    box = 1
+    box = 4
     Ombh2, Omch2, w, ns, ln10As, H0, Neff, sig8 = AD.test_box_cosmologies()[box]
 
     cosmo={'Obh2':Ombh2, 'Och2':Omch2, 'w0':w, 'n_s':ns, 'ln10^{10}A_s':ln10As, 'N_eff':Neff, 'H0':H0}#, 'sigma8':sig8}
