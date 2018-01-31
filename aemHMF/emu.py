@@ -9,8 +9,8 @@ import numpy as np
 import scipy.optimize as op
 import aemulus_data as AD
 data_path = os.path.dirname(os.path.abspath(inspect.stack()[0][1]))+"/data_files/"
-model = "special"
-#model = "dfg"
+#model = "special"
+model = "de0fg"
 R_matrix_path = data_path+"R_%s.txt"%model
 means_path    = data_path+"r_%s_means.txt"%model
 vars_path     = data_path+"r_%s_vars.txt"%model
@@ -76,7 +76,7 @@ if __name__ == "__main__":
     truth = t.means[0]
     err = np.sqrt(t.vars[0])
     pred = t.predict_rotated_params(cos)
-    print "Truth Err Pred"
+    print "Truth   \tErr\t        Pred"
     for i in range(len(truth)):
-        print "%.2e %.2e %.2e"%(truth[i], err[i], pred[i])
+        print "%.2e\t%.2e\t%.2e"%(truth[i], err[i], pred[i])
 

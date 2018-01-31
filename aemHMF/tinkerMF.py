@@ -40,16 +40,15 @@ class tinkerMF(object):
             'P_k_max_1/Mpc':10.,
             'z_max_pk':10.
         }
-        self.classcosmo = Class()
-        self.classcosmo.set(params)
-        self.classcosmo.compute()
-        self.k_array = np.logspace(-5, 1, num=1000) #Mpc^-1
+        self.cc = Class()
+        self.cc.set(params)
+        self.cc.compute()
+        self.k = np.logspace(-5, 1, num=1000) #Mpc^-1
         cos = self.cos_from_dict(cosmo_dict)
         self.t08_slopes_intercepts = self.params_emu.predict_slopes_intercepts(cos)
         print self.t08_slopes_intercepts
         
-    def cos_from_dict(self, cosmo_dict):
-        cd = cosmo_dict
+    def cos_from_dict(self, cd):
         Och2 = cd['Och2']
         Obh2 = cd['Obh2']
         w0 = cd['w0']
@@ -57,10 +56,7 @@ class tinkerMF(object):
         H0  = cd['H0']
         Neff = cd['N_eff']
         l10As = cd['ln10^{10}A_s']
-        #sigma8 = cd['sigma8']
-        out = np.array([Obh2, Och2, w0, ns, l10As, H0, Neff])
-        #out = np.array([Obh2, Och2, w0, ns, H0, Neff, sigma8])
-        return out
+        return np.array([Obh2, Och2, w0, ns, l10As, H0, Neff])
 
     def get_tinker_parameters(self, z):
         params = self.t08_slopes_intercepts
@@ -87,8 +83,8 @@ class tinkerMF(object):
     def GM(self, M, z):
         h = self.cosmo_dict['H0']/100.
         Omega_m = (self.cosmo_dict['Obh2']+self.cosmo_dict['Och2'])/h**2
-        k = self.k_array #Mpc^-1
-        p = np.array([self.classcosmo.pk_lin(ki, z) for ki in k])*h**3 #[Mpc/h]^3
+        k = self.k #Mpc^-1
+        p = np.array([self.cc.pk_lin(ki, z) for ki in k])*h**3 #[Mpc/h]^3
         d, e, f, g = self.get_tinker_parameters(z)
         return massfunction.G_at_M(M, k/h, p, Omega_m, d, e, f, g)
 
@@ -99,8 +95,8 @@ class tinkerMF(object):
     def dndlM(self, M, z):
         h = self.cosmo_dict['H0']/100.
         Omega_m = (self.cosmo_dict['Obh2']+self.cosmo_dict['Och2'])/h**2
-        k = self.k_array #Mpc^-1
-        p = np.array([self.classcosmo.pk_lin(ki, z) for ki in k])*h**3 #[Mpc/h]^3
+        k = self.k #Mpc^-1
+        p = np.array([self.cc.pk_lin(ki, z) for ki in k])*h**3 #[Mpc/h]^3
         d, e, f, g = self.get_tinker_parameters(z)
         return massfunction.dndM_at_M(M, k/h, p, Omega_m, d, e, f, g)*M
 
@@ -115,9 +111,9 @@ class tinkerMF(object):
     def peak_height(self, M, z):
         h = self.cosmo_dict['H0']/100.
         Omega_m = (self.cosmo_dict['Obh2']+self.cosmo_dict['Och2'])/h**2
-        k = self.k_array #Mpc^-1
-        p = np.array([self.classcosmo.pk_lin(ki, z) for ki in k])*h**3 #[Mpc/h]^3
-        return 1.686/np.sqrt(bias.sigma2_at_M(M, k, p, Omega_m))
+        k = self.k #Mpc^-1
+        p = np.array([self.cc.pk_lin(ki, z) for ki in k])*h**3 #[Mpc/h]^3
+        return 1.686/np.sqrt(bias.sigma2_at_M(M, k/h, p, Omega_m))
 
 if __name__ == "__main__":
     cos = {"Och2":0.12,
