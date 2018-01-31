@@ -9,8 +9,8 @@ import numpy as np
 import scipy.optimize as op
 import aemulus_data as AD
 data_path = os.path.dirname(os.path.abspath(inspect.stack()[0][1]))+"/data_files/"
-#model = "special"
-model = "dfg"
+model = "special"
+#model = "dfg"
 R_matrix_path = data_path+"R_%s.txt"%model
 means_path    = data_path+"r_%s_means.txt"%model
 vars_path     = data_path+"r_%s_vars.txt"%model
