@@ -30,7 +30,6 @@ class Aemulus_HMF(object):
             if cosmo_dict['wa'] != 0:
                 raise Exception("AemulusError: 'wa' must be set to 0")
         self.tinkerMF = tinkerMF.tinkerMF()
-        cosmo_dict['wa'] = 0.0 #Aemulus simulations don't have wa
         self.tinkerMF.set_cosmology(cosmo_dict)
 
     def Mtosigma(self, M, z):
@@ -48,11 +47,14 @@ class Aemulus_HMF(object):
     def dndlM(self, M, z):
         return self.tinkerMF.dndlM(M, z)
 
-    def n_bin(self, Mlow, Mhigh, z):
-        return self.tinkerMF.n_bin(Mlow, Mhigh, z)
+    def n_in_bin(self, Mlow, Mhigh, z):
+        return self.tinkerMF.n_in_bin(Mlow, Mhigh, z)
 
-    def n_bins(self, Mbins, z):
-        return self.tinkerMF.n_bins(Mbins, z)
+    def n_in_bins(self, Mbins, z):
+        return self.tinkerMF.n_in_bins(Mbins, z)
+
+    def peak_height(self, M, z):
+        return self.tinkerMF.peak_height(M, z)
 
     def residual_realization(self, M, z, Nrealizations=1):
         nu = self.tinkerMF.peak_height(M, z)
@@ -65,11 +67,11 @@ if __name__ == "__main__":
     z = 0
     Mbins = np.array([Medges[:-1], Medges[1:]]).T
     M = np.mean(Mbins, 1)
-    n = hmf.n_bins(Mbins, z)
+    n = hmf.n_in_bins(Mbins, z)
     fs = hmf.residual_realization(M, z, 50)
     print n
     
     def wrapper():
-        n = hmf.n_bins(Mbins, z)
+        n = hmf.n_in_bins(Mbins, z)
     import timeit
     print timeit.timeit(wrapper, number=10)
