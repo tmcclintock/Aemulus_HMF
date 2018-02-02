@@ -6,20 +6,22 @@ import inspect
 import numpy as np
 import os
 data_path = os.path.dirname(os.path.abspath(inspect.stack()[0][1]))
-Rt08_path = data_path+"/data_files/R_T08.txt"
+data = np.loadtxt(data_path+"/data_files/residuals_bb.txt")
+M, nus, zs, R, Re, N,Na,box,snap = data.T
+
 
 #The kernel for the GP. Hyperparameters have been optimized elsewhere.
-kernel = george.kernels.ConstantKernel(log_constant= -7.4627695322, ndim=2, axes=np.array([0, 1]))*george.kernels.ExpSquaredKernel([ 0.45806604,  1.2785944 ], ndim=2)
+lguess = np.array([ 2.39798486, 2.75768252])
+kernel = george.kernels.ExpSquaredKernel(lguess, ndim=len(lguess))
 
 class residual_gp(object):
     
     def __init__(self):
-        z, lM, nu, R, eR, box_inds, snap_inds = np.genfromtxt(Rt08_path, unpack=True)
-        self.R   = R
-        self.eR  = eR
+        self.R   = R*0
+        self.Re  = Re
         self.gp = george.GP(kernel)
-        self.x = np.array([nu, z]).T
-        self.gp.compute(self.x, yerr=eR)
+        self.x = np.array([nus, zs]).T
+        self.gp.compute(self.x, yerr=Re)
     
     def predict_residual(self, nu, z):
         if np.shape(nu) != np.shape(z):
@@ -28,7 +30,7 @@ class residual_gp(object):
             x = np.atleast_2d([nu, z])
         else: #nu and z are arrays
             x = np.array([nu, z]).T
-        return self.gp.predict(self.R*0, x)
+        return self.gp.predict(self.R, x)
 
     def residual_realization(self, nu, z):
         if np.shape(nu) != np.shape(z):
@@ -37,11 +39,10 @@ class residual_gp(object):
             x = np.atleast_2d([nu, z])
         else: #nu and z are arrays
             x = np.array([nu, z]).T
-        return self.gp.sample_conditional(self.R*0, x)
+        return self.gp.sample_conditional(self.R, x)
 
 
 if __name__ == "__main__":
-    zs, lMs, nus, R, Re, box, snap = np.genfromtxt(Rt08_path, unpack=True)
     residual = residual_gp()
     import matplotlib.pyplot as plt
     N = 100
