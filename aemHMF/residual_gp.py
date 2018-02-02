@@ -19,7 +19,7 @@ class residual_gp(object):
     def __init__(self):
         self.R   = R*0
         self.Re  = Re
-        self.gp = george.GP(kernel)
+        self.gp = george.GP(kernel, white_noise=np.log(np.var(Re)))
         self.x = np.array([nus, zs]).T
         self.gp.compute(self.x, yerr=Re)
     
