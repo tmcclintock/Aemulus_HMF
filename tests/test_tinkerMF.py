@@ -3,7 +3,19 @@ import numpy as np
 import numpy.testing as npt
 from aemHMF import tinkerMF as tmf
 
-cos = {"Omega_m":0.3, "Omega_b":0.05, "h":0.7, "A_s":2.19e-9, "sigma8":0.8, "n_s":0.96, "w0":-1.0, "N_eff":3.0146, "wa":0.0}
+Om = 0.3
+Ob = 0.05
+h = 0.7
+Ombh2 = Ob*h**2
+Omch2 = Om*h**2 - Ombh2
+H0 = 100*h
+ns = 0.96
+ln10As = np.log10(10**10*2.19e-9)
+w = -1.0
+Neff = 3.0146
+
+cos={'Obh2':Ombh2, 'Och2':Omch2, 'w0':w, 'n_s':ns, 'ln10^{10}A_s':ln10As, 'N_eff':Neff, 'H0':H0}
+#cos = {"Omega_m":0.3, "Omega_b":0.05, "h":0.7, "A_s":2.19e-9, "sigma8":0.8, "n_s":0.96, "w0":-1.0, "N_eff":3.0146, "wa":0.0}
 
 mf = tmf.tinkerMF()
 mf.set_cosmology(cos)
