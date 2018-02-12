@@ -39,7 +39,7 @@ class tinkerMF(object):
             'Omega_Lambda': 1.-Omega_m,
             'N_eff':cosmo_dict['N_eff'],
             'P_k_max_1/Mpc':10.,
-            'z_max_pk':3.
+            'z_max_pk':5.1
         }
         self.cc = Class()
         self.cc.set(params)
