@@ -32,8 +32,8 @@ def test_tinkerMF():
     assert hasattr(mf, 'Gsigma')
     assert hasattr(mf, 'GM')
     assert hasattr(mf, 'dndlM')
-    assert hasattr(mf, 'n_bin')
-    assert hasattr(mf, 'n_bins')
+    assert hasattr(mf, 'n_in_bin')
+    assert hasattr(mf, 'n_in_bins')
     
 def test_dndlM_mass_dependence():
     for z in zs:
@@ -48,19 +48,19 @@ def test_dndlM_single_vs_array():
     
 def test_bin_mass_dependence():
     for z in zs:
-        n = mf.n_bins(Mbins, z)
+        n = mf.n_in_bins(Mbins, z)
         npt.assert_array_less(n[1:], n[:-1])
 
 def test_bin_vs_bins():
     for z in zs:
-        narr = mf.n_bins(Mbins, z)
-        narr2 = np.array([mf.n_bin(Mbi[0], Mbi[1], z) for Mbi in Mbins])
+        narr = mf.n_in_bins(Mbins, z)
+        narr2 = np.array([mf.n_in_bin(Mbi[0], Mbi[1], z) for Mbi in Mbins])
         npt.assert_array_equal(narr, narr2)
 
 def test_sf_dependence():
     for i in range(len(zs)-1):
-        n1 = mf.n_bins(Mbins, zs[i]) #higher z
-        n2 = mf.n_bins(Mbins, zs[i+1]) #lower z
+        n1 = mf.n_in_bins(Mbins, zs[i]) #higher z
+        n2 = mf.n_in_bins(Mbins, zs[i+1]) #lower z
         npt.assert_array_less(n1/n1, n2/n1)
 
 if __name__ == "__main__":
