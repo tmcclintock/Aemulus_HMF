@@ -134,7 +134,6 @@ class tinkerMF(object):
     def n_in_bin(self, Mlow, Mhigh, z):
         M, dndM = self._M_and_dndM(z)
         out =  massfunction.n_in_bin(Mlow, Mhigh, M, dndM)
-        print Mlow, Mhigh, out
         return out
         
     def n_in_bins(self, Mbins, z):
@@ -165,7 +164,9 @@ if __name__ == "__main__":
     for i in xrange(0,1):
         z = float(i)
         dndlM = n.dndlM(M, z)
+        n = n.n_in_bins(Mbins, z)
         plt.loglog(M, dndlM, label="z=%d"%i, ls='-')
+        plt.loglog(np.mean(Mbins,1), n)
     plt.legend(loc=0)
     plt.xlabel("Mass")
     plt.xscale('log')
