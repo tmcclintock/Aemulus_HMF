@@ -39,7 +39,7 @@ class tinkerMF(object):
             'Omega_Lambda': 1.-Omega_m,
             'N_eff':cosmo_dict['N_eff'],
             'P_k_max_1/Mpc':10.,
-            'z_max_pk':5.1
+            'z_max_pk':3.0
         }
         self.cc = Class()
         self.cc.set(params)
@@ -133,7 +133,9 @@ class tinkerMF(object):
 
     def n_in_bin(self, Mlow, Mhigh, z):
         M, dndM = self._M_and_dndM(z)
-        return massfunction.n_in_bin(Mlow, Mhigh, M, dndM)
+        out =  massfunction.n_in_bin(Mlow, Mhigh, M, dndM)
+        print Mlow, Mhigh, out
+        return out
         
     def n_in_bins(self, Mbins, z):
         return np.array([self.n_in_bin(Mbi[0], Mbi[1], z) for Mbi in Mbins])
