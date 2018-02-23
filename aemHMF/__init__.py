@@ -60,6 +60,11 @@ class Aemulus_HMF(object):
         nu = self.tinkerMF.peak_height(M, z)
         return np.array([self.residualgp.residual_realization(nu, np.ones_like(nu)*z) for i in range(Nrealizations)])
 
+    def model_uncertainty(self, M, z):
+        nu = self.tinkerMF.peak_height(M, z)
+        zero, cov = self.residualgp.predict_residual(nu, np.ones_like(nu)*z)
+        return np.sqrt(cov.diagonal())
+    
 if __name__ == "__main__":
     hmf = Aemulus_HMF()
     hmf.set_cosmology()

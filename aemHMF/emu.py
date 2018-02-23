@@ -13,6 +13,7 @@ data_path = os.path.dirname(os.path.abspath(inspect.stack()[0][1]))+"/data_files
 model = "de1fg"
 R_matrix_path = data_path+"R_%s.txt"%model
 means_path    = data_path+"r_%s_means.txt"%model
+true_means_path = data_path+"%s_means.txt"%model
 vars_path     = data_path+"r_%s_vars.txt"%model
 cosmos = AD.building_box_cosmologies()
 cosmos = np.delete(cosmos, -1, 1) #Delete sigma8
@@ -22,13 +23,15 @@ N_params = len(cosmos[0])
 
 means  = np.genfromtxt(means_path)
 var   = np.genfromtxt(vars_path)
+truemeans = np.loadtxt(true_means_path)
+R = np.loadtxt(R_matrix_path)
     
 class emu(object):
 
     def __init__(self):
-        self.R      = np.loadtxt(R_matrix_path)
-        self.means  = np.loadtxt(means_path)
-        self.vars   = np.loadtxt(vars_path)
+        self.R      = R
+        self.means  = means
+        self.vars   = var
         self.cosmos = cosmos
         self.train()
         self.name=model
@@ -41,9 +44,9 @@ class emu(object):
         gplist = []
         for i in range(N_emus):
             y, yerr = means[:, i], errs[:, i]
-            kernel = 1.0*ExpSquaredKernel(lguess, ndim=N_params)
-            gp = george.GP(kernel, mean=np.mean(y), fit_mean=True,
-                           white_noise=np.log(np.mean(yerr)**2), fit_white_noise=True)
+            kernel = ExpSquaredKernel(lguess, ndim=N_params)
+            gp = george.GP(kernel, mean=np.mean(y), fit_mean=False,
+                           white_noise=np.log(np.mean(yerr)**2), fit_white_noise=False)
             gp.compute(cosmos, yerr)
             def nll(p):
                 gp.set_parameter_vector(p)
@@ -55,6 +58,7 @@ class emu(object):
             p0 = gp.get_parameter_vector()
             results = op.minimize(nll, p0, jac=grad_nll)
             gp.set_parameter_vector(results.x)
+            #print results.x
             gplist.append(gp)
         self.gplist = gplist
         return
@@ -66,18 +70,19 @@ class emu(object):
 
     def predict_slopes_intercepts(self, cosmo):
         params = self.predict_rotated_params(cosmo)
-        #return params.flatten()
         return np.dot(self.R, params).flatten()
 
 if __name__ == "__main__":
+    box = 34
     t = emu()
-    cos = cosmos[0]
+    cos = cosmos[box]
     print "ombh2 omch2 w0 ns ln10As H0 Neff\n", cos
-    truth = t.means[0]
-    err = np.sqrt(t.vars[0])
+    truth = t.means[box]
+    err = np.sqrt(t.vars[box])
     pred = t.predict_rotated_params(cos)
     print "Truth   \tErr\t        Pred"
     for i in range(len(truth)):
         print "%.2e\t%.2e\t%.2e"%(truth[i], err[i], pred[i])
     print t.predict_slopes_intercepts(cos)
-
+    print truemeans[box]
+    print np.dot(R, truth).flatten()

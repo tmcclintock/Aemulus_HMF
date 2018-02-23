@@ -7,7 +7,6 @@ import numpy as np
 from scipy import special, integrate
 from scipy.interpolate import InterpolatedUnivariateSpline as IUS
 from scipy.interpolate import RectBivariateSpline as RBS
-#from scipy.interpolate import interp2d as RBS
 import emu, sys
 
 #Physical constants
@@ -158,15 +157,15 @@ if __name__ == "__main__":
            "N_eff":3.0146}
     n = tinkerMF()
     n.set_cosmology(cos)
+    print n.get_tinker_parameters(0)
     M = np.logspace(12, 16, num=20)
     Mbins = np.array([M[:-1], M[1:]]).T
     import matplotlib.pyplot as plt
-    for i in xrange(0,1):
-        z = float(i)
-        dndlM = n.dndlM(M, z)
-        n = n.n_in_bins(Mbins, z)
-        plt.loglog(M, dndlM, label="z=%d"%i, ls='-')
-        plt.loglog(np.mean(Mbins,1), n)
+    z = 0.0
+    dndlM = n.dndlM(M, z)
+    n = n.n_in_bins(Mbins, z)
+    plt.loglog(M, dndlM, label="z=%.1f"%z, ls='-')
+    plt.loglog(np.mean(Mbins,1), n)
     plt.legend(loc=0)
     plt.xlabel("Mass")
     plt.xscale('log')
