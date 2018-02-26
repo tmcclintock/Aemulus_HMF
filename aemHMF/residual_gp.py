@@ -6,12 +6,13 @@ import inspect
 import numpy as np
 import os
 data_path = os.path.dirname(os.path.abspath(inspect.stack()[0][1]))
-data = np.loadtxt(data_path+"/data_files/residuals_bb.txt")
+p1 = "1p"
+data = np.loadtxt(data_path+"/data_files/"+p1+"residuals_bb.txt")
 M, nus, zs, R, Re, N,Na,box,snap = data.T
 
-
 #The kernel for the GP. Hyperparameters have been optimized elsewhere.
-lguess = np.array([ 2.39798486, 2.75768252])
+lguess = np.array([ 2.41449252, 5.50585975])
+#lguess = np.array([ 2.39798486, 2.75768252])
 kernel = george.kernels.ExpSquaredKernel(lguess, ndim=len(lguess))
 
 class residual_gp(object):
@@ -19,7 +20,7 @@ class residual_gp(object):
     def __init__(self):
         self.R   = R*0
         self.Re  = Re
-        self.gp = george.GP(kernel, white_noise=np.log(np.var(Re)))
+        self.gp = george.GP(kernel, white_noise=0.00565521)
         self.x = np.array([nus, zs]).T
         self.gp.compute(self.x, yerr=Re)
     

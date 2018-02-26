@@ -11,10 +11,11 @@ import aemulus_data as AD
 data_path = os.path.dirname(os.path.abspath(inspect.stack()[0][1]))+"/data_files/"
 
 model = "de1fg"
-R_matrix_path = data_path+"R_%s.txt"%model
-means_path    = data_path+"r_%s_means.txt"%model
+p1 = "1p"
+R_matrix_path = data_path+p1+"R_%s.txt"%model
+means_path    = data_path+p1+"r_%s_means.txt"%model
 true_means_path = data_path+"%s_means.txt"%model
-vars_path     = data_path+"r_%s_vars.txt"%model
+vars_path     = data_path+p1+"r_%s_vars.txt"%model
 cosmos = AD.building_box_cosmologies()
 cosmos = np.delete(cosmos, -1, 1) #Delete sigma8
 
@@ -80,9 +81,12 @@ if __name__ == "__main__":
     truth = t.means[box]
     err = np.sqrt(t.vars[box])
     pred = t.predict_rotated_params(cos)
+    print "Rotated Parameters:"
     print "Truth   \tErr\t        Pred"
     for i in range(len(truth)):
         print "%.2e\t%.2e\t%.2e"%(truth[i], err[i], pred[i])
-    print t.predict_slopes_intercepts(cos)
-    print truemeans[box]
-    print np.dot(R, truth).flatten()
+    print "Unrotated Parameters:"
+    pred = t.predict_slopes_intercepts(cos)
+    truth = np.dot(R, truth).flatten()
+    for i in range(len(truth)):
+        print "%.2e\t%.2e"%(truth[i], pred[i])
