@@ -3,7 +3,7 @@ This contains the Aemulus HMF emulator.
 """
 import os, sys
 import tinkerMF
-import residual_gp
+import residual_model
 import numpy as np
 
 class Aemulus_HMF(object):
@@ -20,7 +20,7 @@ class Aemulus_HMF(object):
 
     def __init__(self):
         self.tinkerMF = None
-        self.residualgp = residual_gp.residual_gp()
+        self.residual_model = residual_model.residual_model()
 
     def set_cosmology(self, cosmo_dict=None):
         if not cosmo_dict:
@@ -58,12 +58,11 @@ class Aemulus_HMF(object):
 
     def residual_realization(self, M, z, Nrealizations=1):
         nu = self.tinkerMF.peak_height(M, z)
-        return np.array([self.residualgp.residual_realization(nu, np.ones_like(nu)*z) for i in range(Nrealizations)])
+        return np.array([self.residual_model.residual_realization(nu, z) for i in range(Nrealizations)])
 
     def model_uncertainty(self, M, z):
         nu = self.tinkerMF.peak_height(M, z)
-        zero, cov = self.residualgp.predict_residual(nu, np.ones_like(nu)*z)
-        return np.sqrt(cov.diagonal())
+        return self.residual_model.predict_residual(nu, np.ones_like(nu)*z)
     
 if __name__ == "__main__":
     hmf = Aemulus_HMF()
