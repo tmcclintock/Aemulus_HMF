@@ -9,7 +9,7 @@ class residual_model(object):
     def __init__(self):
         """The best fit parameters of the model.
         """
-        self.params = params = np.array([ 0.00280242,  0.00217791,  0.00224816,  0.447591  ,  0.69548156])
+        self.params = np.array([ 0.00515895, -0.00090184,  0.00337056,  0.19945752,  0.63865842])
 
     def predict_residual(self, nu, z):
         a, b, c, shift, cz = self.params

@@ -10,8 +10,8 @@ import scipy.optimize as op
 import aemulus_data as AD
 data_path = os.path.dirname(os.path.abspath(inspect.stack()[0][1]))+"/data_files/"
 
-model = "de1fg"
-p1 = "1p"
+model = "np7_mi5"
+p1 = ""
 R_matrix_path = data_path+p1+"R_%s.txt"%model
 means_path    = data_path+p1+"r_%s_means.txt"%model
 true_means_path = data_path+"%s_means.txt"%model
@@ -74,7 +74,7 @@ class emu(object):
         return np.dot(self.R, params).flatten()
 
 if __name__ == "__main__":
-    box = 34
+    box = 23
     t = emu()
     cos = cosmos[box]
     print "ombh2 omch2 w0 ns ln10As H0 Neff\n", cos
