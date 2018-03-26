@@ -63,8 +63,12 @@ class tinkerMF(object):
 
     def get_tinker_parameters(self, z):
         params = self.t08_slopes_intercepts
-        d0,e0,f0,g0,d1,f1,g1 = params
-        e1 = 0.24327712
+        #d0,e0,f0,g0,d1,f1,g1 = params
+        #e1 = 0.24327712
+        #d0,e0,f0,g0,d1,e1,g1 = params
+        #f1 = 0.11628991
+        e0,f0,g0,d1,e1,g1 = params
+        d0, f1 = [ 2.39279115, 0.11628991]
         """
         if len(params) == 8:
             d0,d1,e0,e1,f0,f1,g0,g1 = params
