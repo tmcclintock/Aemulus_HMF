@@ -9,14 +9,14 @@ class residual_model(object):
     def __init__(self):
         """The best fit parameters of the model.
         """
-        self.params = np.array([ 0.00515895, -0.00090184,  0.00337056,  0.19945752,  0.63865842])
+        self.params = np.array([ -2.62986651e+00,   8.20315156e-01,   1.39089166e+00, 2.34282853e-03])
+
 
     def predict_residual(self, nu, z):
-        a, b, c, shift, cz = self.params
-        pivot = 1.8 #pivot nu
-        zx = z - 1.0
-        x = nu-pivot*(1+zx*shift)
-        return (a*x**2 + b*x +c)*(zx**2 + cz)
+        a,b,c, floor = self.params
+        zx = (1./(1+z))-0.5
+        return floor+10**(a+b*(nu-3) + c*zx)
+
 
     def covariance_of_residuals(self, nu, z):
         #Note: the covariance length is set to 1.
