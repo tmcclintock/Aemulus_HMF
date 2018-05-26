@@ -2,7 +2,8 @@
 This file contains the actual Tinker08 mass function. It uses emu to get the mass function parameters.
 """
 from classy import Class
-from cluster_toolkit import massfunction, bias
+from cluster_toolkit import massfunction
+from cluster_toolkit import peak_height as ph
 import numpy as np
 from scipy import special, integrate
 from scipy.interpolate import InterpolatedUnivariateSpline as IUS
@@ -99,9 +100,9 @@ class tinkerMF(object):
         M = self.M_array
         Mt = M*(1-1e-6*0.5)
         Mb = M*(1+1e-6*0.5)
-        self.sig[z] = bias.sigma2_at_M(M, k/h, p, Omega_m)
-        self.sigt[z] = bias.sigma2_at_M(Mt, k/h, p, Omega_m)
-        self.sigb[z] = bias.sigma2_at_M(Mb, k/h, p, Omega_m)
+        self.sig[z] = ph.sigma2_at_M(M, k/h, p, Omega_m)
+        self.sigt[z] = ph.sigma2_at_M(Mt, k/h, p, Omega_m)
+        self.sigb[z] = ph.sigma2_at_M(Mb, k/h, p, Omega_m)
         self.ccp[z] = p
         
     def GM(self, M, z):
@@ -153,7 +154,7 @@ class tinkerMF(object):
         if z not in self.ccp:
             self._add_sigma_at_z(z)
         p = self.ccp[z]
-        return 1.686/np.sqrt(bias.sigma2_at_M(M, k/h, p, Omega_m))
+        return 1.686/np.sqrt(ph.sigma2_at_M(M, k/h, p, Omega_m))
 
 if __name__ == "__main__":
     cos = {"Och2":0.12,
