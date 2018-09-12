@@ -2,8 +2,8 @@
 This contains the Aemulus HMF emulator.
 """
 import os, sys
-import tinkerMF
-import residual_gp
+from aemHMF import tinkerMF
+from aemHMF import residual_gp
 import numpy as np
 
 class Aemulus_HMF(object):

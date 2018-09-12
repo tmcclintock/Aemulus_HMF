@@ -1,15 +1,15 @@
 """
 This file contains the actual Tinker08 mass function. It uses emu to get the mass function parameters.
 """
+from __future__ import absolute_import, division, print_function
+
 import cosmocalc as cc
-from classy import Class
-from cluster_toolkit import bias
 import numpy as np
 from scipy import special, integrate
 from scipy.interpolate import InterpolatedUnivariateSpline as IUS
 from scipy.interpolate import RectBivariateSpline as RBS
 #from scipy.interpolate import interp2d as RBS
-import emu
+from aemHMF import emu
 
 #Physical constants
 G = 4.51715e-48 #Newton's gravitional constant in Mpc^3/s^2/Solar Mass
@@ -117,7 +117,7 @@ if __name__ == "__main__":
     n = tinkerMF()
     M = np.logspace(12, 16, num=10)
 
-    for i in xrange(0,1):
+    for i in range(0,1):
         a = 1./(1.+i)
         c = (1-a)/2
         n.set_cosmology(cos)
