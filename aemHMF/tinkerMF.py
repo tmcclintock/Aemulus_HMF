@@ -3,13 +3,14 @@ This file contains the actual Tinker08 mass function. It uses emu to get the mas
 """
 from __future__ import absolute_import, division, print_function
 
-import cosmocalc as cc
+#import cosmocalc as cc
 import numpy as np
 from scipy import special, integrate
 from scipy.interpolate import InterpolatedUnivariateSpline as IUS
 from scipy.interpolate import RectBivariateSpline as RBS
 #from scipy.interpolate import interp2d as RBS
 from aemHMF import emu
+import cosmocalc as cc
 
 #Physical constants
 G = 4.51715e-48 #Newton's gravitional constant in Mpc^3/s^2/Solar Mass

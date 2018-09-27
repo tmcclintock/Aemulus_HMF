@@ -8,12 +8,12 @@ if __name__ == "__main__":
 
     a = 1.0
     box, snap = 0, 9
-    lMlo, lMhi, N, Mtot = AD.get_test_box_binned_mass_function(box, snap).T
+    lMlo, lMhi, N, Mtot = AD.test_box_binned_mass_function(box, snap).T
     M_bins = 10**np.array([lMlo, lMhi]).T
     M = Mtot/N
     Volume = 1050.**3 #Mpc^3/h^3
 
-    Ombh2, Omch2, w, ns, ln10As, H0, Neff, sig8 = np.genfromtxt(AD.path_to_test_box_cosmologies())[box]
+    Ombh2, Omch2, w, ns, ln10As, H0, Neff, sig8 = np.genfromtxt(AD._path_to_test_box_cosmologies())[box]
     h = H0/100.
     Ob = Ombh2/h**2
     Oc = Omch2/h**2
