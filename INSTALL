@@ -2,6 +2,7 @@ Requirements
 
 george
 eigen
+Aemulus_data from https://github.com/tmcclintock/Aemulus_data.git
 cosmocalc from beckermr
   sudo apt-get install libfftw3-dev libfftw3-doc
   gsl too
