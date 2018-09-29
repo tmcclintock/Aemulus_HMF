@@ -72,10 +72,14 @@ if __name__ == "__main__":
     n = hmf.n_bins(Mbins, a)
     fs = hmf.residual_realization(M, a, 50)
 
+    logM = np.log10(M)
+    dlogM = logM - np.roll(logM,1)
+    dlogM[0] = dlogM[1]
+
     import matplotlib.pyplot as plt
     fig, axarr = plt.subplots(2, sharex=True)
-    axarr[0].loglog(M, n)
-    axarr[0].set_ylabel('n(M) (Mpc**-3)')
+    axarr[0].loglog(M, n/dlogM)
+    axarr[0].set_ylabel('n(M) / dlogM (Mpc**-3)')
     for i in range(len(fs)):
         ns = n*(1+fs[i])
         axarr[1].plot(M, (n-ns)/ns, alpha=0.2)
