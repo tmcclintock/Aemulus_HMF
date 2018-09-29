@@ -104,7 +104,9 @@ class tinkerMF(object):
         M = np.logspace(np.log10(Mlow), np.log10(Mhigh), num=1000)
         lM = np.log(M)
         dndlM = np.array([self.dndlM(Mi, a) for Mi in M])
+        # Spline time
         spl = IUS(lM, dndlM)
+        # Integrate and return
         return spl.integral(np.log(Mlow), np.log(Mhigh))
 
     def n_bins(self, Mbins, a):
