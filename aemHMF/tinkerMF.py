@@ -48,8 +48,7 @@ class tinkerMF(object):
         self.M_array = np.logspace(11, 16.5, num=250)
         self.t08_slopes_intercepts = self.params_emu.predict_slopes_intercepts(self.cos_from_dict(cosmo_dict))
         self.sig  = {}
-        self.sigt = {}
-        self.sigb = {}
+        self.dsig2dM = {}
         self.ccp  = {}
 
     def cos_from_dict(self, cd):
@@ -101,8 +100,7 @@ class tinkerMF(object):
         Mt = M*(1-1e-6*0.5)
         Mb = M*(1+1e-6*0.5)
         self.sig[z] = ph.sigma2_at_M(M, k/h, p, Omega_m)
-        self.sigt[z] = ph.sigma2_at_M(Mt, k/h, p, Omega_m)
-        self.sigb[z] = ph.sigma2_at_M(Mb, k/h, p, Omega_m)
+        self.dsig2dM[z] = ph.dsigma2dM_at_M(M, k/h, p, Omega_m)
         self.ccp[z] = p
         
     def GM(self, M, z):
@@ -123,10 +121,9 @@ class tinkerMF(object):
         if z not in self.sig:
             self._add_sigma_at_z(z)
         sig = self.sig[z]
-        sigt = self.sigt[z]
-        sigb = self.sigb[z]
+        dsig2dM = self.dsig2dM[z]
         M = self.M_array
-        dndM = massfunction._dndM_sigma2_precomputed(M, sig, sigt, sigb, Omega_m, d, e, f, g)
+        dndM = massfunction._dndM_sigma2_precomputed(M, sig, dsig2dM, Omega_m, d, e, f, g)
         return M, dndM
     
     def dndlM(self, M, z):
