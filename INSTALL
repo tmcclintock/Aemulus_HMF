@@ -1,0 +1,18 @@
+Requirements
+
+george
+eigen
+Aemulus_data from https://github.com/tmcclintock/Aemulus_data.git
+cosmocalc from beckermr  https://github.com/beckermr/cosmocalc
+  sudo apt-get install libfftw3-dev libfftw3-doc
+  gsl too
+    import os
+    include_gsl_dir = os.getenv('GSL_PATH')+'/include/'
+    lib_gsl_dir = os.getenv('GSL_PATH')+'/lib/'
+    cosmocalc_module = Extension(
+      'cosmocalc._cosmocalc',
+      sources=srcs,
+      include_dirs=[include_gsl_dir],
+      library_dirs=[lib_gsl_dir],
+      extra_link_args=["-lfftw3", "-lm", "-lgsl", "-lgslcblas"],
+    )

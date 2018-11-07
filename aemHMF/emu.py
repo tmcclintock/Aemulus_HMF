@@ -2,6 +2,8 @@
 This contains the code necessary to predict the Tinker08 MF parameters. 
 It does not contain the code for the mass function itself.
 """
+from __future__ import absolute_import, division, print_function
+
 import george
 import os, inspect
 import numpy as np
@@ -42,7 +44,7 @@ class emu(object):
             gp.compute(cosmos, yerr)
             def nll(p):
                 gp.set_parameter_vector(p)
-                ll = gp.lnlikelihood(y, quiet=True)
+                ll = gp.log_likelihood(y, quiet=True)
                 return -ll if np.isfinite(ll) else 1e25
             def grad_nll(p):
                 gp.set_parameter_vector(p)
@@ -63,4 +65,4 @@ class emu(object):
 if __name__ == "__main__":
     t = emu()
     cos = cosmos[0]
-    print t.predict_slopes_intercepts(cos)
+    print(t.predict_slopes_intercepts(cos))

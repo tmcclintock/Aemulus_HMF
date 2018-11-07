@@ -1,9 +1,11 @@
 """
 This contains the Aemulus HMF emulator.
 """
+from __future__ import absolute_import, division, print_function
+
 import os, sys
-import tinkerMF
-import residual_gp
+from aemHMF import tinkerMF
+from aemHMF import residual_gp
 import numpy as np
 
 class Aemulus_HMF(object):
@@ -64,16 +66,22 @@ if __name__ == "__main__":
     a = 1.0 #Scale factor
     hmf = Aemulus_HMF()
     hmf.set_default_cosmology()
-    Medges = np.logspace(11, 16, num=11)
+    Medges = np.logspace(11, 16, num=31)
     Mbins = np.array([Medges[:-1], Medges[1:]]).T
     M = np.mean(Mbins, 1)
     n = hmf.n_bins(Mbins, a)
     fs = hmf.residual_realization(M, a, 50)
 
+    logM = np.log10(M)
+    dlogM = logM - np.roll(logM,1)
+    dlogM[0] = dlogM[1]
+
     import matplotlib.pyplot as plt
     fig, axarr = plt.subplots(2, sharex=True)
-    axarr[0].loglog(M, n)
+    axarr[0].loglog(M, n/dlogM)
+    axarr[0].set_ylabel('n(M) / dlogM (Mpc**-3)')
     for i in range(len(fs)):
         ns = n*(1+fs[i])
         axarr[1].plot(M, (n-ns)/ns, alpha=0.2)
+    axarr[1].set_xlabel(r'$M_{\rm halo}$')
     plt.show()
