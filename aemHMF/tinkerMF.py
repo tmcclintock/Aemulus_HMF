@@ -45,7 +45,7 @@ class tinkerMF(object):
         self.cc.set(params)
         self.cc.compute()
         self.k = np.logspace(-5, 1, num=1000) #Mpc^-1
-        self.M_array = np.logspace(11, 16.5, num=250)
+        self.M_array = np.logspace(10, 16.5, num=350)
         self.t08_slopes_intercepts = self.params_emu.predict_slopes_intercepts(self.cos_from_dict(cosmo_dict))
         self.sig  = {}
         self.dsig2dM = {}
